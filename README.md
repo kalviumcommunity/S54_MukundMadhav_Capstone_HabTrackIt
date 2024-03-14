@@ -13,7 +13,7 @@
     - [Leaderboard](#leaderboard)
 - [Technologies Used](#technologies-used)
 - [How To Setup Locally](#how-to-setup-locally)
-    - [Sysyem Requirements](#system-requirements)
+    - [System Requirements](#system-requirements)
     - [Installation Steps](#installation-steps)
 - [How to Contribute](#how-to-contribute)
 - [Contact](#contact)
