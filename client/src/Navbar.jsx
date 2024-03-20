@@ -1,10 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Flex, Image, Button, IconButton } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [displayMenu, setDisplayMenu] = useState("none");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Changing hamburger's display value
+  const toggleMenu = () => {
+    setDisplayMenu(displayMenu === "none" ? "flex" : "none");
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  // Function to handle window resize
+  const handleResize = () => {
+    // Setting displayMenu to none for larger screens
+    if (window.innerWidth > 768) {
+      setDisplayMenu("none");
+    }
+  };
+
+  // Using useEffect to add event listener on component mount and remove on unmount
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   return (
     <>
       <header>
@@ -79,12 +103,13 @@ const Navbar = () => {
             </Button>
           </Flex>
           <IconButton
-            aria-label="Open Menu"
+            aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
             size="lg"
             mr={2}
-            icon={<HamburgerIcon />}
+            icon={isMenuOpen ? <CloseIcon /> : <HamburgerIcon />}
             display={["flex", "flex", "none", "none"]}
-            onClick={() => setDisplayMenu("flex")}
+            onClick={toggleMenu}
+            aria-expanded={isMenuOpen ? "expanded" : "collapsed"}
           />
           <Flex
             w="100vw"
@@ -105,11 +130,11 @@ const Navbar = () => {
                 aria-label="Close Menu"
                 size="lg"
                 icon={<CloseIcon />}
-                onClick={() => setDisplayMenu("none")}
+                onClick={toggleMenu}
               />
             </Flex>
             <Flex flexDir="column" align="center">
-              <Link to="/">
+              <Link to="/signup">
                 <Button
                   variant="ghost"
                   color="white"
@@ -145,6 +170,15 @@ const Navbar = () => {
                   Write Us
                 </Button>
               </Link>
+              <Button
+                _hover={{ border: "1px solid white" }}
+                colorScheme="white"
+                color="white"
+                bg="#4D5097"
+                fontWeight="700"
+              >
+                Login
+              </Button>
             </Flex>
           </Flex>
         </Flex>
