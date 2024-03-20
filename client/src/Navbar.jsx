@@ -24,10 +24,7 @@ const Navbar = () => {
               />
             </Link>
           </Box>
-          <Flex
-            className="link-container"
-            display={["none", "none", "flex", "flex"]}
-          >
+          <Flex className="link-container">
             <Link to="/">
               <Button
                 variant="ghost"
