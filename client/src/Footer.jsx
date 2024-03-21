@@ -32,7 +32,6 @@ const Footer = () => {
         px={8}
         py={4}
         top="100%"
-        zIndex="20"
       >
         <Stack
           className="foot-1"
