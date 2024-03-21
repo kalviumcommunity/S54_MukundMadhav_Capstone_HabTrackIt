@@ -3,6 +3,24 @@ import { Flex, Stack, Heading, Text, Image } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
+  
+  const technologyStack = [
+    "React JS",
+    "Express JS",
+    "Node JS",
+    "MongoDB",
+    "Websocket IO",
+  ];
+
+  const features = [
+    "Habit Tracking",
+    "Streak Building",
+    "Bad Habit Breaker",
+    "Progress Visualization",
+    "Reminder & Notifications",
+    "Leader Board",
+  ];
+
   return (
     <>
       <Stack
@@ -14,6 +32,7 @@ const Footer = () => {
         px={8}
         py={4}
         top="100%"
+        zIndex="20"
       >
         <Stack
           className="foot-1"
@@ -30,7 +49,11 @@ const Footer = () => {
               About
             </Heading>
             <Link to={"/write-us"}>Support</Link>
-            <a href="mailto:mukundmadhav054@gmail.com?subject=Regarding HabTrackIt">
+            <a
+              href="mailto:mukundmadhav054@gmail.com?subject=Regarding HabTrackIt"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Contact Us
             </a>
             <Link to={"/faq"}>FAQ</Link>
@@ -40,11 +63,11 @@ const Footer = () => {
             <Heading as="h3" size="lg" mb={4}>
               Technology Used
             </Heading>
-            <Text fontSize="md">React JS</Text>
-            <Text fontSize="md">Express JS</Text>
-            <Text fontSize="md">Node JS</Text>
-            <Text fontSize="md">MongoDB</Text>
-            <Text fontSize="md">Websocket IO</Text>
+            {technologyStack.map((tech, index) => (
+              <Text key={index} fontSize="md">
+                {tech}
+              </Text>
+            ))}
           </Flex>
         </Stack>
         <Stack className="foot-2">
@@ -52,12 +75,11 @@ const Footer = () => {
             <Heading as="h3" size="lg" mb={4}>
               Features
             </Heading>
-            <Text fontSize="md">Habit Tracking</Text>
-            <Text fontSize="md">Streak Building</Text>
-            <Text fontSize="md">Bad Habit Breaker</Text>
-            <Text fontSize="md">Progress Visualization</Text>
-            <Text fontSize="md">Reminder & Notifications</Text>
-            <Text fontSize="md">Leader Board</Text>
+            {features.map((feature, index) => (
+              <Text key={index} fontSize="md">
+                {feature}
+              </Text>
+            ))}
           </Flex>
           <Flex
             className="social-link-container"
@@ -65,13 +87,25 @@ const Footer = () => {
             mt={[20, 20, 0, 0]}
             columnGap={4}
           >
-            <a href="https://www.linkedin.com/in/imukundmadhav/">
+            <a
+              href="https://www.linkedin.com/in/imukundmadhav/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Image src="./LinkedIn.svg" />
             </a>
-            <a href="https://www.github.com/mukundmadhav054">
+            <a
+              href="https://www.github.com/mukundmadhav054"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Image src="./GitHub.svg" />
             </a>
-            <a href="https://www.instagram.com/mukund__here">
+            <a
+              href="https://www.instagram.com/mukund__here"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Image src="./Instagram.svg" />
             </a>
           </Flex>
