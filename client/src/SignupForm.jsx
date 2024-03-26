@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import {
@@ -24,17 +24,19 @@ export default function SignupForm() {
   const {
     handleSubmit,
     register,
-    formState: { errors },
-  } = useForm();
+    formState: { errors, isValid },
+    watch,
+  } = useForm({ mode: "onChange" });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const password = useRef({});
+  password.current = watch("password", "");
 
   const handleShowClick1 = () => setShowPassword(!showPassword);
   const handleShowClick2 = () => setShowConfirmPassword(!showConfirmPassword);
 
   const onSubmit = (values) => {
     console.log(values);
-    // Here you can perform additional actions like sending the form data to a server
   };
 
   return (
@@ -119,11 +121,10 @@ export default function SignupForm() {
                       placeholder="Re-enter your password"
                       bg={"rgba(34, 50, 73, 0.65)"}
                       border={"none"}
-                      // w={"100%"}
                       {...register("confirmPassword", {
                         required: "Please confirm your password",
                         validate: (value) =>
-                          value === register("password").value ||
+                          value === password.current ||
                           "Passwords do not match",
                       })}
                     />
@@ -155,7 +156,7 @@ export default function SignupForm() {
                   type="submit"
                   maxW={"fit-content"}
                   justifySelf={"center"}
-                  disabled={Object.keys(errors).length !== 0}
+                  disabled={!isValid}
                   fontWeight={"bold"}
                   fontSize={"3vh"}
                   variant={"solid"}

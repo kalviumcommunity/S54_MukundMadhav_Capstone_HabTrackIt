@@ -41,6 +41,7 @@ const HomePage = () => {
               w="426px"
               my={4}
               ml={28}
+              loading="lazy"
             />
           </Flex>
           <VStack>
