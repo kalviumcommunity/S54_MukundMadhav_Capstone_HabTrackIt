@@ -14,7 +14,7 @@ const habitSchema = new mongoose.Schema(
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: UserModel,
+      ref: user,
       required: true,
     },
     score: {
@@ -31,7 +31,16 @@ const habitSchema = new mongoose.Schema(
 
 habitSchema.pre("save", function (next) {
   const now = new Date();
-  if (!this.isNew || now.getDate() !== this._doc.lastUpdatedDate?.getDate()) {
+  // Check if it's a new document or if the lastUpdatedDate needs to be updated
+  if (this.isNew || this.modifiedPaths().includes("status")) {
+    this.status = false;
+    this.lastUpdatedDate = now;
+  } else if (
+    !this.isNew &&
+    this.lastUpdatedDate &&
+    now.getDate() !== this.lastUpdatedDate.getDate()
+  ) {
+    // Reset status to false if it's a new day
     this.status = false;
     this.lastUpdatedDate = now;
   }
