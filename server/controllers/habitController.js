@@ -11,6 +11,7 @@ const getAllHabits = async (req, res) => {
         .json({ message: "No habits found in the collection." });
     }
   } catch (error) {
+    console.error("Error occurred while fetching all habits:", error);
     res
       .status(500)
       .json({ error: "Internal Server Error", message: error.message });
@@ -29,6 +30,7 @@ const getHabitsByUser = async (req, res) => {
         .json({ message: "No habits found for this user." });
     }
   } catch (error) {
+    console.error("Error occurred while fetching habits by user:", error);
     res
       .status(500)
       .json({ error: "Internal Server Error", message: error.message });

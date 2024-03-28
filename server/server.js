@@ -8,9 +8,22 @@ const habitRouter = require("./routes/habitRoutes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const server = createServer(app);
+
+// Function to determine CORS origin based on environment mode
+const getCorsOrigin = () => {
+  switch (process.env.NODE_ENV) {
+    case "development":
+      return "*";
+    case "production":
+      return ["https://habtrackit.vercel.app/"];
+    default:
+      return "*";
+  }
+};
+
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: getCorsOrigin(),
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -20,7 +33,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "*",
+    origin: getCorsOrigin(),
     methods: ["GET", "POST"],
     credentials: true,
   })
@@ -41,7 +54,9 @@ const startServer = async () => {
     db = await connectedToDB();
     process.on("SIGINT", async () => {
       console.log("Received SIGINT. Shutting down gracefully...");
+      io.close();
       await db.close();
+      process.exit(0);
     });
   } catch (err) {
     console.error("Failed to start server:", err.message);
