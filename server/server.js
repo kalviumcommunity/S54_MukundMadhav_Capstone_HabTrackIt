@@ -4,6 +4,7 @@ const { createServer } = require("http");
 const cors = require("cors");
 const connectedToDB = require("./config/db");
 const habitRouter = require("./routes/habitRoutes");
+const userRouter = require("./routes/userRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,9 +33,15 @@ const io = new Server(server, {
 app.use(express.json());
 
 // Defined the Home Route
-app.get("/",(req,res)=>{
-  res.json({"Project Name": "HabTrackIt", "message": "Welcome to HabTrackIt's Server!","description":"HabTrackIt helps the user to track his/her habits which he/she wants to do daily or wants to break.","contact":{"email":"mukundmadhav054@gmail.com","github":"mukundmadhav054"}})
-})
+app.get("/", (req, res) => {
+  res.json({
+    "Project Name": "HabTrackIt",
+    message: "Welcome to HabTrackIt's Server!",
+    description:
+      "HabTrackIt helps the user to track his/her habits which he/she wants to do daily or wants to break.",
+    contact: { email: "mukundmadhav054@gmail.com", github: "mukundmadhav054" },
+  });
+});
 
 app.use(
   cors({
@@ -52,6 +59,7 @@ app.use((err, req, res, next) => {
 
 // For Using all the routes
 app.use("/", habitRouter);
+app.use("/", userRouter);
 
 // For connecting and disconnecting from the server
 const startServer = async () => {

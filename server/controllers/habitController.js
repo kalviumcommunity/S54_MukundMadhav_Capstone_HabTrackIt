@@ -37,4 +37,28 @@ const getHabitsByUser = async (req, res) => {
   }
 };
 
-module.exports = { getAllHabits, getHabitsByUser };
+const postHabit = async (req, res) => {
+  try {
+    const { title, user } = req.body;
+    const existingHabit = await habitModel.findOne({ title, user });
+    if (existingHabit) {
+      return res.status(400).json({
+        error: "A habit with the same title already exist for this user.",
+      });
+    }
+
+    const newHabit = await habitModel.create(req.body);
+    if (newHabit) {
+      return res.status(201).json(newHabit);
+    } else {
+      return res.status(400).json({ error: "Failed to post new Habit!" });
+    }
+  } catch (error) {
+    console.error("Error occurred while posting new habit:", error);
+    res
+      .status(500)
+      .json({ error: "Internal Server Error", message: error.message });
+  }
+};
+
+module.exports = { getAllHabits, getHabitsByUser, postHabit };
