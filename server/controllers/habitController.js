@@ -19,8 +19,8 @@ const getAllHabits = async (req, res) => {
 
 const getHabitsByUser = async (req, res) => {
   try {
-    const userId = req.params.userId;
-    const habits = await habitModel.find({ user: userId });
+    const userName = req.params.username;
+    const habits = await habitModel.find({ username: userName });
     if (habits.length > 0) {
       return res.status(200).json(habits);
     } else {

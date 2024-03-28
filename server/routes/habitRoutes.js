@@ -7,6 +7,6 @@ const {
 } = require("../controllers/habitController");
 
 habitRouter.get("/habits", getAllHabits);
-habitRouter.get("/habits/id/:userId", getHabitsByUser);
+habitRouter.get("/habits/user/:username", getHabitsByUser);
 
 module.exports = habitRouter;

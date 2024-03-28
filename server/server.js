@@ -51,21 +51,6 @@ const startServer = async () => {
 
 startServer();
 
-// Initializing and disconnecting web socket connection
-io.on("connection", (socket) => {
-  console.log("User Connected!");
-  console.log("Id", socket.id);
-
-  socket.on("message", (data) => {
-    console.log(data);
-    socket.broadcast.emit("received-message", data);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected :", socket.id);
-  });
-});
-
 // Listening to the server at the PORT
 server.listen(PORT, () => {
   console.log(`Server is running on PORT : ${PORT}`);
