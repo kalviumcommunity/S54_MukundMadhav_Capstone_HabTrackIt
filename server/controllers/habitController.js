@@ -31,7 +31,7 @@ const getHabitsByUser = async (req, res) => {
     }
   } catch (error) {
     console.error("Error occurred while fetching habits by user:", error);
-    res
+    return res
       .status(500)
       .json({ error: "Internal Server Error", message: error.message });
   }
