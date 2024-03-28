@@ -40,6 +40,10 @@ const getHabitsByUser = async (req, res) => {
 const postHabit = async (req, res) => {
   try {
     const { title, user } = req.body;
+    if (!title || title.trim().length === 0) {
+      return res.status(400).json({ error: "Habit title is required." });
+    }
+
     const existingHabit = await habitModel.findOne({ title, user });
     if (existingHabit) {
       return res.status(400).json({

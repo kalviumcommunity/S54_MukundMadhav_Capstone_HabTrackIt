@@ -36,14 +36,14 @@ const findUser = async (req, res) => {
     const { email, username, password } = req.body;
     const user = await userModel.findOne({ $or: [{ email }, { username }] });
     if (!user) {
-      return res.json("No such user exits!!");
+      return res.status(401).json("Invalid Credentials!");
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (isPasswordCorrect) {
       return res.status(200).json({ user });
     } else {
-      return res.status(400).json("Invalid Credentials!");
+      return res.status(401).json("Invalid Credentials!");
     }
   } catch (error) {
     console.error("Error occurred while logging in user:", error);
