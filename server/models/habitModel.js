@@ -13,7 +13,7 @@ const habitSchema = new mongoose.Schema(
       required: true,
     },
     user: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       ref: UserModel,
       required: true,
     },
