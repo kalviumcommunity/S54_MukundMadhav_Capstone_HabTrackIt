@@ -31,6 +31,11 @@ const io = new Server(server, {
 
 app.use(express.json());
 
+// Defined the Home Route
+app.get("/",(req,res)=>{
+  res.json({"Project Name": "HabTrackIt", "message": "Welcome to HabTrackIt's Server!","description":"HabTrackIt helps the user to track his/her habits which he/she wants to do daily or wants to break.","contact":{"email":"mukundmadhav054@gmail.com","github":"mukundmadhav054"}})
+})
+
 app.use(
   cors({
     origin: getCorsOrigin(),
