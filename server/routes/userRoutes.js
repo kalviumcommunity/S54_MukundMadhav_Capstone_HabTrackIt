@@ -7,7 +7,9 @@ const {
   updateUser,
 } = require("../controllers/userController");
 
-userRouter.post("/signup", createUser);
+const userValidator = require("../middlewares/userValidator");
+
+userRouter.post("/signup", userValidator, createUser);
 userRouter.post("/login", findUser);
 
 userRouter.put("/reset-password", updateUser);
