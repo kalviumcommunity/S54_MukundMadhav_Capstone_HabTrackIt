@@ -10,8 +10,8 @@ const {
 const userValidator = require("../middlewares/userValidator");
 
 userRouter.post("/signup", userValidator, createUser);
-userRouter.post("/login", userValidator, findUser);
+userRouter.post("/login", findUser);
 
-userRouter.put("/reset-password", userValidator, updateUser);
+userRouter.put("/reset-password", updateUser);
 
 module.exports = userRouter;
