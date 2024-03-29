@@ -16,7 +16,7 @@ const getCorsOrigin = () => {
     case "development":
       return "*";
     case "production":
-      return ["https://habtrackit.vercel.app/"];
+      return ["https://habtrackit.vercel.app/","https://habtrackit.onrender.com"];
     default:
       return "*";
   }
