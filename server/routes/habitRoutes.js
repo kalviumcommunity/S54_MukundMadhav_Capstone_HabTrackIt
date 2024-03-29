@@ -9,10 +9,10 @@ const {
 } = require("../controllers/habitController");
 
 habitRouter.get("/habits", getAllHabits);
-habitRouter.get("/habits/user/:username", getHabitsByUser);
+habitRouter.get("/habits/user/:userId", getHabitsByUser);
 
 habitRouter.post("/habits", postHabit);
 
-habitRouter.put("/update/:habitId", updateHabit);
+habitRouter.put("/habits/update/:habitId", updateHabit);
 
 module.exports = habitRouter;
