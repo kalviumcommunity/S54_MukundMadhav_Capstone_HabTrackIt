@@ -7,9 +7,11 @@ const {
   updateUser,
 } = require("../controllers/userController");
 
-userRouter.post("/signup", createUser);
-userRouter.post("/login", findUser);
+const userValidator = require("../middlewares/userValidator");
 
-userRouter.put("/reset-password", updateUser);
+userRouter.post("/signup", userValidator, createUser);
+userRouter.post("/login", userValidator, findUser);
+
+userRouter.put("/reset-password", userValidator, updateUser);
 
 module.exports = userRouter;
