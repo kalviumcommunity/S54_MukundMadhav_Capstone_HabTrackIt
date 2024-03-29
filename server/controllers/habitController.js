@@ -70,6 +70,15 @@ const updateHabit = async (req, res) => {
   try {
     const { habitId } = req.params;
     const updateData = req.body;
+    // Validation of fields to be updated
+    const allowedFields = ["title", "type", "status"];
+    const isValidOperation = Object.keys(updateData).every((field) =>
+      allowedFields.includes(field)
+    );
+    if (!isValidOperation) {
+      return res.status(400).json({ error: "Invalid fields for update." });
+    }
+
     if (!mongoose.Types.ObjectId.isValid(habitId)) {
       return res.status(400).json({ error: "Invalid habit ID." });
     }
