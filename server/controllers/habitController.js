@@ -1,3 +1,4 @@
+const { mongoose } = require("mongoose");
 const habitModel = require("../models/habitModel");
 
 const getAllHabits = async (req, res) => {
@@ -65,4 +66,38 @@ const postHabit = async (req, res) => {
   }
 };
 
-module.exports = { getAllHabits, getHabitsByUser, postHabit };
+const updateHabit = async (req, res) => {
+  try {
+    const { habitId } = req.params;
+    const updateData = req.body;
+    // Validation of fields to be updated
+    const allowedFields = ["title", "type", "status"];
+    const isValidOperation = Object.keys(updateData).every((field) =>
+      allowedFields.includes(field)
+    );
+    if (!isValidOperation) {
+      return res.status(400).json({ error: "Invalid fields for update." });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(habitId)) {
+      return res.status(400).json({ error: "Invalid habit ID." });
+    }
+
+    const updatedHabit = await habitModel.findByIdAndUpdate(
+      habitId,
+      updateData,
+      { new: true }
+    );
+    if (!updatedHabit) {
+      return res.status(404).json({ error: "Habit not found." });
+    }
+    return res.status(200).json(updatedHabit);
+  } catch (error) {
+    console.error("Error occurred while updating habit:", error);
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", message: error.message });
+  }
+};
+
+module.exports = { getAllHabits, getHabitsByUser, postHabit, updateHabit };
