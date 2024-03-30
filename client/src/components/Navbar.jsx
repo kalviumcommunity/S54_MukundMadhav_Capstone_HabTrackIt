@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Box, Flex, Image, Button, IconButton } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
+import debounce from "lodash/debounce";
 
 const Navbar = () => {
   const [displayMenu, setDisplayMenu] = useState("none");
@@ -14,12 +15,12 @@ const Navbar = () => {
   };
 
   // Function to handle window resize
-  const handleResize = () => {
+  const handleResize = debounce(() => {
     // Setting displayMenu to none for larger screens
     if (window.innerWidth > 768) {
       setDisplayMenu("none");
     }
-  };
+  }, 100);
 
   // Using useEffect to add event listener on component mount and remove on unmount
   useEffect(() => {
