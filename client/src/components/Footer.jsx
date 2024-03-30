@@ -3,7 +3,6 @@ import { Flex, Stack, Heading, Text, Image } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
-  
   const technologyStack = [
     "React JS",
     "Express JS",

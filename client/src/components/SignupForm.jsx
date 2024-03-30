@@ -2,7 +2,6 @@ import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import {
-  Box,
   Flex,
   Stack,
   Heading,
@@ -49,13 +48,13 @@ export default function SignupForm() {
         bgGradient="linear(to-br, #326BA0, #063882)"
         className="signup-container"
       >
-        <Stack spacing={4} alignItems={"center"}>
+        <Stack spacing={2} alignItems={"center"}>
           <Heading color="white" as={"h2"} size={"lg"} mb={4}>
             Sign Up For Free
           </Heading>
           <Flex rounded={"lg"} minW={"20vw"} flexDir={"column"}>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <SimpleGrid columns={1} spacingY={4} justifyContent={"center"}>
+              <SimpleGrid columns={1} spacingY={3} justifyContent={"center"}>
                 <FormControl id="email">
                   <FormLabel>Email Address</FormLabel>
                   <Input
@@ -168,7 +167,7 @@ export default function SignupForm() {
               </SimpleGrid>
             </form>
             <Divider
-              my={4}
+              my={[4, 4, 2, 2]}
               borderColor={"#314664"}
               borderBottomWidth={"2px"}
               w={"90%"}
