@@ -4,7 +4,7 @@ import SignupForm from "./SignupForm";
 
 const Signup = () => {
   return (
-    <Box bgGradient="linear(to-br,#1B1745,#233249)" minH={"100vh"}>
+    <Box bgGradient="linear(to-br,#1B1745,#233249)" minH="calc(100vh - 5em)">
       <VStack textColor={"white"} pt={6} justifyContent={"center"}>
         <Flex flexDir={"column"} alignItems={"center"}>
           <Flex>
