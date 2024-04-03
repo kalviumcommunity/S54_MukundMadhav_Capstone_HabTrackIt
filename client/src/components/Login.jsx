@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, VStack, Image, Flex, calc } from "@chakra-ui/react";
+import { Box, VStack, Image, Flex } from "@chakra-ui/react";
 import LoginForm from "./LoginForm";
 
 const Login = () => {

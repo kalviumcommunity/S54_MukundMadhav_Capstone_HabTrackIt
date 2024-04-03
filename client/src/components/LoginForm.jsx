@@ -95,7 +95,7 @@ export default function SignupForm() {
                           value:
                             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/,
                           message:
-                            "Password must contain atleast 1 uppercase, 1 lowercase, 1 numeric, 1 special character in it.",
+                            "Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, and 1 special character.",
                         },
                       })}
                     />
