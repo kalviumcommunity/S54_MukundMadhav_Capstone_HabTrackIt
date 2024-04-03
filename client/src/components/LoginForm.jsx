@@ -27,73 +27,51 @@ export default function SignupForm() {
     watch,
   } = useForm({ mode: "onChange" });
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const password = useRef({});
   password.current = watch("password", "");
 
-  const handleShowClick1 = () => setShowPassword(!showPassword);
-  const handleShowClick2 = () => setShowConfirmPassword(!showConfirmPassword);
+  const handleShowClick = () => setShowPassword(!showPassword);
 
   const onSubmit = (values) => {
     console.log(values);
   };
 
   return (
-    <Flex align={"flex-start"} justify={"center"}>
+    <Flex align={"center"} justify={"center"}>
       <Container
-        maxW={"800px"}
+        w={["86vw", "86vw", "25vw", "25vw"]}
         boxShadow={"xl"}
         rounded={"2xl"}
         p={6}
         bgGradient="linear(to-br, #326BA0, #063882)"
-        className="signup-container"
+        className="login-container"
       >
         <Stack spacing={2} alignItems={"center"}>
           <Heading color="white" as={"h2"} size={"lg"} mb={4}>
-            Sign Up For Free
+            Login To Your Account
           </Heading>
-          <Flex rounded={"lg"} minW={"20vw"} flexDir={"column"}>
+          <Flex rounded={"lg"} flexDir={"column"} w="100%">
             <form onSubmit={handleSubmit(onSubmit)}>
               <SimpleGrid columns={1} spacingY={3} justifyContent={"center"}>
-                <FormControl id="username">
-                  <FormLabel>Username</FormLabel>
+                <FormControl id="usernameOrEmail">
+                  <FormLabel>Username or Email</FormLabel>
                   <Input
-                    placeholder="Enter your username"
+                    placeholder="Enter your Username or Email"
                     bg={"rgba(34, 50, 73, 0.65)"}
                     border={"none"}
-                    {...register("username", {
-                      required: "Username is required",
+                    w="100%"
+                    {...register("usernameOrEmail", {
+                      required: "This field is required",
                       minLength: {
                         value: 3,
-                        message: "Username must be at least 3 characters long",
-                      },
-                      maxLength: {
-                        value: 20,
-                        message: "Username must be less than 20 characters",
+                        message: "Input must be at least 3 characters long",
                       },
                     })}
                   />
-                  {errors.username && (
-                    <Text color="red.500">{errors.username.message}</Text>
-                  )}
-                </FormControl>
-
-                <FormControl id="email">
-                  <FormLabel>Email Address</FormLabel>
-                  <Input
-                    placeholder="Enter your email address"
-                    bg={"rgba(34, 50, 73, 0.65)"}
-                    border={"none"}
-                    {...register("email", {
-                      required: "Email is required",
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Invalid email address",
-                      },
-                    })}
-                  />
-                  {errors.email && (
-                    <Text color="red.500">{errors.email.message}</Text>
+                  {errors.usernameOrEmail && (
+                    <Text color="red.500">
+                      {errors.usernameOrEmail.message}
+                    </Text>
                   )}
                 </FormControl>
 
@@ -105,6 +83,7 @@ export default function SignupForm() {
                       placeholder="Enter your password"
                       bg={"rgba(34, 50, 73, 0.65)"}
                       border={"none"}
+                      w="100%"
                       {...register("password", {
                         required: "Password is required",
                         minLength: {
@@ -112,13 +91,19 @@ export default function SignupForm() {
                           message:
                             "Password must be at least 8 characters long",
                         },
+                        pattern: {
+                          value:
+                            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/,
+                          message:
+                            "Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, and 1 special character.",
+                        },
                       })}
                     />
                     <InputRightElement width="4.5rem">
                       <Button
                         h="1.75rem"
                         size="sm"
-                        onClick={handleShowClick1}
+                        onClick={handleShowClick}
                         bg={"transparent"}
                         _hover={{ bg: "none" }}
                       >
@@ -135,44 +120,6 @@ export default function SignupForm() {
                   )}
                 </FormControl>
 
-                <FormControl id="confirmPassword">
-                  <FormLabel>Confirm Password</FormLabel>
-                  <InputGroup>
-                    <Input
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Re-enter your password"
-                      bg={"rgba(34, 50, 73, 0.65)"}
-                      border={"none"}
-                      {...register("confirmPassword", {
-                        required: "Please confirm your password",
-                        validate: (value) =>
-                          value === password.current ||
-                          "Passwords do not match",
-                      })}
-                    />
-                    <InputRightElement width="4.5rem">
-                      <Button
-                        h="1.75rem"
-                        size="sm"
-                        onClick={handleShowClick2}
-                        bg={"transparent"}
-                        _hover={{ bg: "none" }}
-                      >
-                        {showConfirmPassword ? (
-                          <ViewOffIcon color={"white"} />
-                        ) : (
-                          <ViewIcon color={"white"} />
-                        )}
-                      </Button>
-                    </InputRightElement>
-                  </InputGroup>
-                  {errors.confirmPassword && (
-                    <Text color="red.500">
-                      {errors.confirmPassword.message}
-                    </Text>
-                  )}
-                </FormControl>
-
                 <Button
                   color={"white"}
                   type="submit"
@@ -185,7 +132,7 @@ export default function SignupForm() {
                   _hover={{ bgColor: "#2985DC" }}
                   bgColor={"#316AA0"}
                 >
-                  Sign Up
+                  Log In
                 </Button>
               </SimpleGrid>
             </form>
@@ -198,7 +145,7 @@ export default function SignupForm() {
             />
             <Flex align={"center"} flexDir={"column"}>
               <Heading as={"h4"} fontSize={"md"}>
-                Sign Up
+                Login
               </Heading>
               <Text as={"h5"} fontSize={"xs"}>
                 With
@@ -216,7 +163,7 @@ export default function SignupForm() {
                 </a>
               </Flex>
               <Text>
-                Already have an account ? <Link to={"/login"}>Log in</Link>
+                Don't have an account ? <Link to={"/signup"}>Sign Up</Link>
               </Text>
             </Flex>
           </Flex>

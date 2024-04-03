@@ -93,15 +93,17 @@ const Navbar = () => {
             </Link>
           </Flex>
           <Flex align="center" display={["none", "none", "flex", "flex"]}>
-            <Button
-              _hover={{ border: "1px solid white" }}
-              colorScheme="white"
-              color="white"
-              bg="#4D5097"
-              fontWeight="700"
-            >
-              Login
-            </Button>
+            <Link to={"/login"}>
+              <Button
+                _hover={{ border: "1px solid white" }}
+                colorScheme="white"
+                color="white"
+                bg="#4D5097"
+                fontWeight="700"
+              >
+                Login
+              </Button>
+            </Link>
           </Flex>
           <IconButton
             aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
@@ -171,15 +173,17 @@ const Navbar = () => {
                   Write Us
                 </Button>
               </Link>
-              <Button
-                _hover={{ border: "1px solid white" }}
-                colorScheme="white"
-                color="white"
-                bg="#4D5097"
-                fontWeight="700"
-              >
-                Login
-              </Button>
+              <Link to="/login">
+                <Button
+                  _hover={{ border: "1px solid white" }}
+                  colorScheme="white"
+                  color="white"
+                  bg="#4D5097"
+                  fontWeight="700"
+                >
+                  Login
+                </Button>
+              </Link>
             </Flex>
           </Flex>
         </Flex>
