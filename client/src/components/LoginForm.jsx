@@ -39,7 +39,7 @@ export default function SignupForm() {
   return (
     <Flex align={"center"} justify={"center"}>
       <Container
-        w={["86vw", "86vw", "25vw", "25vw"]}
+        w={["80vw", "45vw", "28vw", "26vw"]}
         boxShadow={"xl"}
         rounded={"2xl"}
         p={6}
@@ -47,7 +47,7 @@ export default function SignupForm() {
         className="login-container"
       >
         <Stack spacing={2} alignItems={"center"}>
-          <Heading color="white" as={"h2"} size={"lg"} mb={4}>
+          <Heading color="white" as={"h2"} size={"md"} mb={4}>
             Login To Your Account
           </Heading>
           <Flex rounded={"lg"} flexDir={"column"} w="100%">
