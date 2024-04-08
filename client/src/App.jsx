@@ -5,11 +5,12 @@ import HomePage from "./components/HomePage";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
+import WriteUs from "./components/WriteUs";
 
 const App = () => {
   const location = useLocation();
   const shouldRenderFooter =
-    location.pathname !== "/signup" && location.pathname !== "/login";
+    location.pathname !== "/signup" && location.pathname !== "/login" && location.pathname !== "/write-us";
 
   return (
     <>
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/write-us" element={<WriteUs />} />
       </Routes>
       {shouldRenderFooter && <Footer />}
     </>
