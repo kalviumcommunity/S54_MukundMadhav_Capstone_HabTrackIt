@@ -56,6 +56,26 @@ const findUser = async (req, res) => {
   }
 };
 
+const ifUserExists = async (req, res) => {
+  try {
+    const { usernameOrEmail } = req.body;
+    const user = await userModel.findOne({
+      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "No user found!" });
+    } else {
+      return res.status(200).json({ user });
+    }
+  } catch (error) {
+    console.error("Error occurred while logging in user:", error);
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", message: error.message });
+  }
+};
+
 const updateUser = async (req, res) => {
   try {
     const { email, username, password } = req.body;
@@ -76,11 +96,9 @@ const updateUser = async (req, res) => {
         .status(200)
         .json({ message: "Password updated successfully!!" });
     } else {
-      return res
-        .status(400)
-        .json({
-          message: "New password should be different from the current one.",
-        });
+      return res.status(400).json({
+        message: "New password should be different from the current one.",
+      });
     }
   } catch (error) {
     console.error("Error occurred while updating the password:", error);
@@ -90,4 +108,4 @@ const updateUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, findUser, updateUser };
+module.exports = { createUser, findUser, ifUserExists, updateUser };

@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import axios from "axios";
 import {
   Flex,
   Image,
@@ -15,6 +16,7 @@ import {
   Textarea,
   Button,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 
 const WriteUs = () => {
@@ -23,9 +25,53 @@ const WriteUs = () => {
     register,
     formState: { errors, isValid },
   } = useForm({ mode: "onChange" });
+  const toast = useToast();
 
-  const onSubmit = (values) => {
-    console.log(values);
+  const onSubmit = async (values) => {
+    try {
+      const { usernameOrEmail, query } = values;
+      const response = await axios.post("http://localhost:3000/existing-user", {
+        usernameOrEmail,
+      });
+      if (response.status === 200 && response.data.user) {
+        const mailtoLink = `mailto:mukundmadhav054@gmail.com?subject=HabTrackIt | Query&body=Username or Email: ${usernameOrEmail}%0A%0A%0A%0A%0AQuery: ${query}`;
+        window.location.href = mailtoLink;
+        toast({
+          title: "User Found",
+          description:
+            "You will be redirected to your mail application, Send it from there.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "An error occurred",
+          description: "Please try again later.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        toast({
+          title: "User Not Found",
+          description: "The provided username or email does not exist.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "An error occurred",
+          description: "Please try again later.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    }
   };
 
   return (
@@ -102,6 +148,11 @@ const WriteUs = () => {
                                 },
                               })}
                             />
+                            {errors.query && (
+                              <Text color="red.500">
+                                {errors.query.message}
+                              </Text>
+                            )}
                           </FormControl>
 
                           <Button
