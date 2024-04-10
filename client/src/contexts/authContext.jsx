@@ -10,6 +10,7 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, initializeUser);
+    return () => unsubscribe();
   }, []);
 
   const initializeUser = async (user) => {
@@ -22,18 +23,18 @@ const AuthProvider = ({ children }) => {
     }
     setLoading(false);
   };
-};
 
-const value = {
-  currentUser,
-  userLoggedIn,
-  loading,
-};
+  const value = {
+    currentUser,
+    userLoggedIn,
+    loading,
+  };
 
-return (
-  <AuthContext.Provider value={value}>
-    {!loading && children}
-  </AuthContext.Provider>
-);
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
+};
 
 export default AuthProvider;
