@@ -1,40 +1,78 @@
-import React, { useState, createContext, useEffect } from "react";
+import {
+  useContext,
+  createContext,
+  useEffect,
+  useState,
+  useLayoutEffect,
+} from "react";
+import {
+  GoogleAuthProvider,
+  signInWithRedirect,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 import { auth } from "../firebase/firebase";
-import { onAuthStateChanged } from "firebase/auth";
-const AuthContext = createContext();
 
-const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userLoggedIn, setUserLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
+const authContext = createContext();
+
+export const AuthContextProvider = ({ children }) => {
+  const [user, setUser] = useState({});
+  const [isuser, setisUser] = useState(false);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+
+  const signInWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithRedirect(auth, provider);
+      setIsUserLoggedIn(true);
+      return userCredential;
+    } catch (error) {
+      setIsUserLoggedIn(false);
+      return error;
+    }
+  };
+
+  const logOut = () => {
+    signOut(auth);
+  };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, initializeUser);
-    return () => unsubscribe();
+    if (!isUserLoggedIn) {
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setUser(user);
+          window.sessionStorage.setItem("user", JSON.stringify(user));
+          setIsUserLoggedIn(true);
+        }
+      });
+      return unsubscribe;
+    }
+  }, []);
+  useLayoutEffect(() => {
+    const checkData = window.sessionStorage.getItem("user");
+    if (checkData) {
+      setIsUserLoggedIn(true);
+    }
   }, []);
 
-  const initializeUser = async (user) => {
-    if (user) {
-      setCurrentUser({ ...user });
-      setUserLoggedIn(true);
-    } else {
-      setCurrentUser(null);
-      setUserLoggedIn(false);
-    }
-    setLoading(false);
-  };
-
-  const value = {
-    currentUser,
-    userLoggedIn,
-    loading,
-  };
-
   return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
+    <authContext.Provider
+      value={{
+        signInWithGoogle,
+        logOut,
+        user,
+        isUserLoggedIn,
+        setIsUserLoggedIn,
+        setUser,
+        isuser,
+        setisUser,
+      }}
+    >
+      {children}
+    </authContext.Provider>
   );
 };
 
-export default AuthProvider;
+export const useAuth = () => {
+  return useContext(authContext);
+};
