@@ -13,13 +13,7 @@ const PORT = process.env.PORT || 3000;
 const server = createServer(app);
 
 
-const io = new Server(server, {
-  cors: {
-    origin: getCorsOrigin(),
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
+const io = new Server(server);
 
 // Defined the Home Route
 app.get("/", (req, res) => {
