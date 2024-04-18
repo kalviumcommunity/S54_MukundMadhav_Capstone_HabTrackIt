@@ -7,6 +7,7 @@ const habitRouter = require("./routes/habitRoutes");
 const userRouter = require("./routes/userRoutes");
 
 const app = express();
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const server = createServer(app);
 
@@ -16,11 +17,25 @@ const getCorsOrigin = () => {
     case "development":
       return "*";
     case "production":
-      return ["https://habtrackit.vercel.app/","https://habtrackit.onrender.com"];
+      return [
+        "https://habtrackit.vercel.app/",
+        "https://habtrackit.onrender.com",
+      ];
     default:
       return "*";
   }
 };
+
+app.use(
+  cors({
+    origin: getCorsOrigin(),
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
+
+console.log("Node env:", process.env.NODE_ENV);
+console.log("origin:", getCorsOrigin());
 
 const io = new Server(server, {
   cors: {
@@ -30,7 +45,6 @@ const io = new Server(server, {
   },
 });
 
-app.use(express.json());
 
 // Defined the Home Route
 app.get("/", (req, res) => {
@@ -42,14 +56,6 @@ app.get("/", (req, res) => {
     contact: { email: "mukundmadhav054@gmail.com", github: "mukundmadhav054" },
   });
 });
-
-app.use(
-  cors({
-    origin: getCorsOrigin(),
-    methods: ["GET", "POST"],
-    credentials: true,
-  })
-);
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

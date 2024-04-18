@@ -1,5 +1,6 @@
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const { throttle } = require("lodash");
 
 const createUser = async (req, res) => {
   try {
@@ -34,14 +35,15 @@ const createUser = async (req, res) => {
   }
 };
 
-const findUser = async (req, res) => {
+const findUser = throttle(async (req, res) => {
   try {
-    const { email, username, password } = req.body;
-    const user = await userModel.findOne({ $or: [{ email }, { username }] });
+    const { usernameOrEmail, password } = req.body;
+    const user = await userModel.findOne({
+      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+    });
     if (!user) {
       return res.status(401).json("No user found!");
     }
-
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (isPasswordCorrect) {
       return res.status(200).json({ user });
@@ -54,7 +56,7 @@ const findUser = async (req, res) => {
       .status(500)
       .json({ error: "Internal Server Error", message: error.message });
   }
-};
+}, 10000, { trailing: false });
 
 const ifUserExists = async (req, res) => {
   try {

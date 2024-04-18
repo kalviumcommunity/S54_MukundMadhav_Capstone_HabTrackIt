@@ -11,6 +11,11 @@ const userValidationSchema = joi.object({
     .label(
       "Password must contain atleast 1 uppercase, 1 lowercase, 1 numeric, 1 special character!!"
     ),
+  confirmPassword: joi
+    .string()
+    .valid(joi.ref("password"))
+    .required()
+    .label("Password and Confirm Password must be same!!"),
 });
 
 const userValidator = (req, res, next) => {

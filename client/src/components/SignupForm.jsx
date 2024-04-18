@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useId } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -23,34 +23,34 @@ import {
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../contexts/authContext";
 import { FcGoogle } from "react-icons/fc";
+import axios from "axios";
 
 export default function SignupForm() {
   const toast = useToast();
   const navigate = useNavigate();
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, setUser, setIsUserLoggedIn } = useAuth();
 
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
       toast({
-        title: 'Sign Up Successful.',
+        title: "Sign Up Successful.",
         description: "Redirecting to homepage.",
-        status: 'success',
+        status: "success",
         duration: 2000,
         isClosable: true,
-      })
-      setTimeout(()=>{
-        navigate("/")
-      },2000)
+      });
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
     } catch (error) {
-      console.log(error);
       toast({
-        title: 'User Sign Up failed.',
-        description: "Try again after sometime or contact us.",
-        status: 'error',
+        title: "User Sign Up failed.",
+        description: error.response ? `${error.response.data}` : "An error occurred",
+        status: "error",
         duration: 2000,
         isClosable: true,
-      })
+      });
     }
   };
 
@@ -60,6 +60,12 @@ export default function SignupForm() {
     formState: { errors, isValid },
     watch,
   } = useForm({ mode: "onChange" });
+
+  const confirmPasswordId = useId();
+  const emailId = useId();
+  const passwordId = useId();
+  const usernameId = useId();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const password = useRef({});
@@ -68,8 +74,36 @@ export default function SignupForm() {
   const handleShowClick1 = () => setShowPassword(!showPassword);
   const handleShowClick2 = () => setShowConfirmPassword(!showConfirmPassword);
 
-  const onSubmit = (values) => {
-    console.log(values);
+  const onSubmit = async (values) => {
+    try {
+      const response = await axios.post("http://localhost:3000/signup", values);
+      setUser({ displayName: response.data.username });
+      window.sessionStorage.setItem(
+        "user",
+        JSON.stringify({ displayName: response.data.username })
+      );
+
+      setIsUserLoggedIn(true);
+      toast({
+        title: "Sign Up Successful.",
+        description: "Redirecting to homepage.",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    } catch (error) {
+      setIsUserLoggedIn(false);
+      toast({
+        title: "User Sign Up failed.",
+        description: error.response ? `${error.response.data}` : "An error occurred",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
@@ -89,7 +123,7 @@ export default function SignupForm() {
           <Flex rounded={"lg"} minW={"20vw"} flexDir={"column"} w={"100%"}>
             <form onSubmit={handleSubmit(onSubmit)}>
               <SimpleGrid columns={1} spacingY={3} justifyContent={"center"}>
-                <FormControl id="username">
+                <FormControl id={usernameId}>
                   <FormLabel>Username</FormLabel>
                   <Input
                     placeholder="Enter your username"
@@ -112,7 +146,7 @@ export default function SignupForm() {
                   )}
                 </FormControl>
 
-                <FormControl id="email">
+                <FormControl id={emailId}>
                   <FormLabel>Email Address</FormLabel>
                   <Input
                     placeholder="Enter your email address"
@@ -131,7 +165,7 @@ export default function SignupForm() {
                   )}
                 </FormControl>
 
-                <FormControl id="password">
+                <FormControl id={passwordId}>
                   <FormLabel>Password</FormLabel>
                   <InputGroup>
                     <Input
@@ -169,7 +203,7 @@ export default function SignupForm() {
                   )}
                 </FormControl>
 
-                <FormControl id="confirmPassword">
+                <FormControl id={confirmPasswordId}>
                   <FormLabel>Confirm Password</FormLabel>
                   <InputGroup>
                     <Input
