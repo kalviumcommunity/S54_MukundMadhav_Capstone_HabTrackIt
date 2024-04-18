@@ -18,19 +18,39 @@ import {
   HStack,
   AbsoluteCenter,
   Box,
+  useToast,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../contexts/authContext";
 import { FcGoogle } from "react-icons/fc";
 
 export default function SignupForm() {
+  const toast = useToast();
+  const navigate = useNavigate();
   const { signInWithGoogle } = useAuth();
 
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
+      toast({
+        title: 'Sign Up Successful.',
+        description: "Redirecting to homepage.",
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      })
+      setTimeout(()=>{
+        navigate("/")
+      },2000)
     } catch (error) {
       console.log(error);
+      toast({
+        title: 'User Sign Up failed.',
+        description: "Try again after sometime or contact us.",
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      })
     }
   };
 

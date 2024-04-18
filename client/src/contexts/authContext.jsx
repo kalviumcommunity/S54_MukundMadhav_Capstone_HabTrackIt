@@ -7,7 +7,7 @@ import {
 } from "react";
 import {
   GoogleAuthProvider,
-  signInWithRedirect,
+  signInWithPopup,
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
@@ -23,7 +23,7 @@ export const AuthContextProvider = ({ children }) => {
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithRedirect(auth, provider);
+      const userCredential = await signInWithPopup(auth, provider);
       setIsUserLoggedIn(true);
       return userCredential;
     } catch (error) {
@@ -37,17 +37,16 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!isUserLoggedIn) {
-      const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-          setUser(user);
-          window.sessionStorage.setItem("user", JSON.stringify(user));
-          setIsUserLoggedIn(true);
-        }
-      });
-      return unsubscribe;
-    }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+        window.sessionStorage.setItem("user", JSON.stringify(user));
+        setIsUserLoggedIn(true);
+      }
+    });
+    return unsubscribe;
   }, []);
+
   useLayoutEffect(() => {
     const checkData = window.sessionStorage.getItem("user");
     if (checkData) {

@@ -3,10 +3,9 @@ import { Box, Flex, Image, Button, IconButton } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 import debounce from "lodash/debounce";
-import { useAuth } from "../contexts/authContext";
+import LoginLogoutButton from "./LoginLogoutButton";
 
 const Navbar = () => {
-  const { user, logOut, setIsUserLoggedIn, isUserLoggedIn } = useAuth();
   const [displayMenu, setDisplayMenu] = useState("none");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -31,16 +30,6 @@ const Navbar = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  const handleSignOut = async () => {
-    try {
-      await logOut();
-      setIsUserLoggedIn(false);
-      window.sessionStorage.removeItem("user");
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return (
     <>
@@ -105,30 +94,7 @@ const Navbar = () => {
             </Link>
           </Flex>
           <Flex align="center" display={["none", "none", "flex", "flex"]}>
-            {isUserLoggedIn ? (
-              <Button
-                _hover={{ border: "1px solid white" }}
-                colorScheme="white"
-                color="white"
-                bg="#4D5097"
-                fontWeight="700"
-                onClick={handleSignOut}
-              >
-                Logout
-              </Button>
-            ) : (
-              <Link to="/login">
-                <Button
-                  _hover={{ border: "1px solid white" }}
-                  colorScheme="white"
-                  color="white"
-                  bg="#4D5097"
-                  fontWeight="700"
-                >
-                  Login
-                </Button>
-              </Link>
-            )}
+            <LoginLogoutButton />
           </Flex>
           <IconButton
             aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
@@ -198,30 +164,7 @@ const Navbar = () => {
                   Write Us
                 </Button>
               </Link>
-              {isUserLoggedIn ? (
-                <Button
-                  _hover={{ border: "1px solid white" }}
-                  colorScheme="white"
-                  color="white"
-                  bg="#4D5097"
-                  fontWeight="700"
-                  onClick={handleSignOut}
-                >
-                  Logout
-                </Button>
-              ) : (
-                <Link to="/login">
-                  <Button
-                    _hover={{ border: "1px solid white" }}
-                    colorScheme="white"
-                    color="white"
-                    bg="#4D5097"
-                    fontWeight="700"
-                  >
-                    Login
-                  </Button>
-                </Link>
-              )}
+              <LoginLogoutButton />
             </Flex>
           </Flex>
         </Flex>
