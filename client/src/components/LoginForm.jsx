@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useId } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -23,15 +23,21 @@ import {
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../contexts/authContext";
 import { FcGoogle } from "react-icons/fc";
+import axios from "axios";
 
 export default function LoginForm() {
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, setIsUserLoggedIn, setUser } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
+  const usernameOrEmailId = useId();
+  const passwordId = useId();
 
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
       toast({
         title: "Sign In Successful.",
         description: "Redirecting to homepage.",
@@ -39,14 +45,10 @@ export default function LoginForm() {
         duration: 2000,
         isClosable: true,
       });
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
     } catch (error) {
-      console.log(error);
       toast({
         title: "User Sign In failed.",
-        description: "Try again after sometime or contact us.",
+        description: `${error.response.data}`,
         status: "error",
         duration: 2000,
         isClosable: true,
@@ -66,8 +68,35 @@ export default function LoginForm() {
 
   const handleShowClick = () => setShowPassword(!showPassword);
 
-  const onSubmit = (values) => {
-    console.log(values);
+  const onSubmit = async (values) => {
+    try {
+      const response = await axios.post("http://localhost:3000/login", values);
+      setUser({ displayName: response.data.user.username });
+      window.sessionStorage.setItem(
+        "user",
+        JSON.stringify({ displayName: response.data.user.username })
+      );
+      setIsUserLoggedIn(true);
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+      toast({
+        title: "Sign In Successful.",
+        description: "Redirecting to homepage.",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    } catch (error) {
+      setIsUserLoggedIn(false);
+      toast({
+        title: "User Sign Up failed.",
+        description: `${error.response.data}`,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
@@ -87,7 +116,7 @@ export default function LoginForm() {
           <Flex rounded={"lg"} flexDir={"column"} w="100%">
             <form onSubmit={handleSubmit(onSubmit)}>
               <SimpleGrid columns={1} spacingY={3} justifyContent={"center"}>
-                <FormControl id="usernameOrEmail">
+                <FormControl id={usernameOrEmailId}>
                   <FormLabel>Username or Email</FormLabel>
                   <Input
                     placeholder="Enter your Username or Email"
@@ -109,7 +138,7 @@ export default function LoginForm() {
                   )}
                 </FormControl>
 
-                <FormControl id="password">
+                <FormControl id={passwordId}>
                   <FormLabel>Password</FormLabel>
                   <InputGroup>
                     <Input
