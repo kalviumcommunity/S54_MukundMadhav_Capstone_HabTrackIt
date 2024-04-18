@@ -7,36 +7,11 @@ const habitRouter = require("./routes/habitRoutes");
 const userRouter = require("./routes/userRoutes");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const server = createServer(app);
 
-// Function to determine CORS origin based on environment mode
-const getCorsOrigin = () => {
-  switch (process.env.NODE_ENV) {
-    case "development":
-      return "*";
-    case "production":
-      return [
-        "https://habtrackit.vercel.app/",
-        "https://habtrackit.onrender.com",
-      ];
-    default:
-      return "*";
-  }
-};
-
-app.use(
-  cors({
-    origin: getCorsOrigin(),
-    methods: ["GET", "POST", "PUT", "DELETE","OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-
-console.log("Node env:", process.env.NODE_ENV);
-console.log("origin:", getCorsOrigin());
 
 const io = new Server(server, {
   cors: {
@@ -45,7 +20,6 @@ const io = new Server(server, {
     credentials: true,
   },
 });
-
 
 // Defined the Home Route
 app.get("/", (req, res) => {
