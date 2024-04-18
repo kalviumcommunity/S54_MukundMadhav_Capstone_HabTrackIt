@@ -76,7 +76,10 @@ export default function SignupForm() {
 
   const onSubmit = async (values) => {
     try {
-      const response = await axios.post("https://habtrackit.onrender.com/signup", values);
+      const response = await axios.post(
+        "https://habtrackit.onrender.com/signup",
+        values
+      );
       setUser({ displayName: response.data.username });
       window.sessionStorage.setItem(
         "user",
@@ -179,6 +182,12 @@ export default function SignupForm() {
                           value: 8,
                           message:
                             "Password must be at least 8 characters long",
+                        },
+                        pattern: {
+                          value:
+                            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/,
+                          message:
+                            "Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, and 1 special character.",
                         },
                       })}
                     />
