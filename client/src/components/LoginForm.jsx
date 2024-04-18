@@ -48,7 +48,7 @@ export default function LoginForm() {
     } catch (error) {
       toast({
         title: "User Sign In failed.",
-        description: `${error.response.data}`,
+        description: error.response ? `${error.response.data}` : "An error occurred",
         status: "error",
         duration: 2000,
         isClosable: true,
@@ -91,7 +91,7 @@ export default function LoginForm() {
       setIsUserLoggedIn(false);
       toast({
         title: "User Sign Up failed.",
-        description: `${error.response.data}`,
+        description: error.response ? `${error.response.data}` : "An error occurred",
         status: "error",
         duration: 2000,
         isClosable: true,
