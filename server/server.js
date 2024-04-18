@@ -29,7 +29,8 @@ const getCorsOrigin = () => {
 app.use(
   cors({
     origin: getCorsOrigin(),
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE","OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
