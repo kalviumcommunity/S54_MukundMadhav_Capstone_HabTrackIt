@@ -36,8 +36,10 @@ const createUser = async (req, res) => {
 
 const findUser = async (req, res) => {
   try {
-    const { email, username, password } = req.body;
-    const user = await userModel.findOne({ $or: [{ email }, { username }] });
+    const { usernameOrEmail, password } = req.body;
+    const user = await userModel.findOne({
+      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+    });
     if (!user) {
       return res.status(401).json("No user found!");
     }
