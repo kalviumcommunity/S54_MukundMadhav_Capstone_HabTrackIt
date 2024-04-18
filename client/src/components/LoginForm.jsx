@@ -70,7 +70,7 @@ export default function LoginForm() {
 
   const onSubmit = async (values) => {
     try {
-      const response = await axios.post("http://localhost:3000/login", values);
+      const response = await axios.post("https://habtrackit.onrender.com/login", values);
       setUser({ displayName: response.data.user.username });
       window.sessionStorage.setItem(
         "user",

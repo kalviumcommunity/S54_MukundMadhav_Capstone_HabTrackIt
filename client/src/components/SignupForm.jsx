@@ -76,7 +76,7 @@ export default function SignupForm() {
 
   const onSubmit = async (values) => {
     try {
-      const response = await axios.post("http://localhost:3000/signup", values);
+      const response = await axios.post("https://habtrackit.onrender.com/signup", values);
       setUser({ displayName: response.data.username });
       window.sessionStorage.setItem(
         "user",
