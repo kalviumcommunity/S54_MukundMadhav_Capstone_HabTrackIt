@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Flex,
   Stack,
@@ -15,11 +15,45 @@ import {
   FormControl,
   FormLabel,
   Divider,
-  Image,
+  HStack,
+  AbsoluteCenter,
+  Box,
+  useToast,
 } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import { useAuth } from "../contexts/authContext";
+import { FcGoogle } from "react-icons/fc";
 
-export default function SignupForm() {
+export default function LoginForm() {
+  const { signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
+  const toast = useToast();
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      toast({
+        title: "Sign In Successful.",
+        description: "Redirecting to homepage.",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "User Sign In failed.",
+        description: "Try again after sometime or contact us.",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  };
+
   const {
     handleSubmit,
     register,
@@ -136,31 +170,33 @@ export default function SignupForm() {
                 </Button>
               </SimpleGrid>
             </form>
-            <Divider
-              my={[4, 4, 2, 2]}
-              borderColor={"#314664"}
-              borderBottomWidth={"2px"}
-              w={"90%"}
-              alignSelf={"center"}
-            />
+            <Box position="relative" p={2}>
+              <Divider
+                my={[4, 4, 2, 2]}
+                borderColor={"#314664"}
+                borderBottomWidth={"2px"}
+                w={"90%"}
+                alignSelf={"center"}
+              />
+              <AbsoluteCenter px="4">Or</AbsoluteCenter>
+            </Box>
             <Flex align={"center"} flexDir={"column"}>
-              <Heading as={"h4"} fontSize={"md"}>
-                Login
-              </Heading>
-              <Text as={"h5"} fontSize={"xs"}>
-                With
-              </Text>
               <Flex
                 className="3rd-party-authentication-container"
-                my={2}
+                mt={"10px"}
+                mb={2}
                 columnGap={10}
               >
-                <a href="">
-                  <Image src="./Google Icon.svg" />
-                </a>
-                <a href="">
-                  <Image src="./Facebook Icon.svg" />
-                </a>
+                <HStack
+                  p={2}
+                  borderRadius={10}
+                  cursor={"pointer"}
+                  onClick={handleGoogleSignIn}
+                  _hover={{ backgroundColor: "#2C2C2C" }}
+                >
+                  <FcGoogle size={"2rem"} />
+                  <Text>Login with Google</Text>
+                </HStack>
               </Flex>
               <Text>
                 Don't have an account ? <Link to={"/signup"}>Sign Up</Link>

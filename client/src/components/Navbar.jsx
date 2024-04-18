@@ -3,6 +3,7 @@ import { Box, Flex, Image, Button, IconButton } from "@chakra-ui/react";
 import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 import debounce from "lodash/debounce";
+import LoginLogoutButton from "./LoginLogoutButton";
 
 const Navbar = () => {
   const [displayMenu, setDisplayMenu] = useState("none");
@@ -93,17 +94,7 @@ const Navbar = () => {
             </Link>
           </Flex>
           <Flex align="center" display={["none", "none", "flex", "flex"]}>
-            <Link to={"/login"}>
-              <Button
-                _hover={{ border: "1px solid white" }}
-                colorScheme="white"
-                color="white"
-                bg="#4D5097"
-                fontWeight="700"
-              >
-                Login
-              </Button>
-            </Link>
+            <LoginLogoutButton />
           </Flex>
           <IconButton
             aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
@@ -173,17 +164,7 @@ const Navbar = () => {
                   Write Us
                 </Button>
               </Link>
-              <Link to="/login">
-                <Button
-                  _hover={{ border: "1px solid white" }}
-                  colorScheme="white"
-                  color="white"
-                  bg="#4D5097"
-                  fontWeight="700"
-                >
-                  Login
-                </Button>
-              </Link>
+              <LoginLogoutButton />
             </Flex>
           </Flex>
         </Flex>
