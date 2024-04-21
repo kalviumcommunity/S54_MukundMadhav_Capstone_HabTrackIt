@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import emailjs from "@emailjs/browser";
 import {
   Flex,
   Image,
@@ -20,6 +21,12 @@ import {
 } from "@chakra-ui/react";
 
 const WriteUs = () => {
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+  }, []);
+
   const {
     handleSubmit,
     register,
@@ -28,20 +35,32 @@ const WriteUs = () => {
   const toast = useToast();
 
   const onSubmit = async (values) => {
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
     try {
+      setLoading(true);
       const { usernameOrEmail, query } = values;
-      const response = await axios.post("http://localhost:3000/existing-user", {
-        usernameOrEmail,
-      });
+      const response = await axios.post(
+        "https://habtrackit.onrender.com/existing-user",
+        {
+          usernameOrEmail,
+        }
+      );
       if (response.status === 200 && response.data.user) {
-        const mailtoLink = `mailto:mukundmadhav054@gmail.com?subject=HabTrackIt | Query&body=Username or Email: ${usernameOrEmail}%0A%0A%0A%0A%0AQuery: ${query}`;
-        window.location.href = mailtoLink;
+        const templeteParams = {
+          from_name: response.data.user.username,
+          from_email: response.data.user.email,
+          to_name: "Mukund Madhav",
+          message: query,
+        };
+
+        await emailjs.send(serviceId, templateId, templeteParams);
+
         toast({
-          title: "User Found",
-          description:
-            "You will be redirected to your mail application, Send it from there.",
+          title: "Message Sent Successfully",
+          description: "You will hear from us ASAP.",
           status: "success",
-          duration: 5000,
+          duration: 2000,
           isClosable: true,
         });
       } else {
@@ -49,7 +68,7 @@ const WriteUs = () => {
           title: "An error occurred",
           description: "Please try again later.",
           status: "error",
-          duration: 5000,
+          duration: 2000,
           isClosable: true,
         });
       }
@@ -59,7 +78,7 @@ const WriteUs = () => {
           title: "User Not Found",
           description: "The provided username or email does not exist.",
           status: "error",
-          duration: 5000,
+          duration: 2000,
           isClosable: true,
         });
       } else {
@@ -67,10 +86,12 @@ const WriteUs = () => {
           title: "An error occurred",
           description: "Please try again later.",
           status: "error",
-          duration: 5000,
+          duration: 2000,
           isClosable: true,
         });
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,7 +175,6 @@ const WriteUs = () => {
                               </Text>
                             )}
                           </FormControl>
-
                           <Button
                             color={"white"}
                             type="submit"
