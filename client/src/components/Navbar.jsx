@@ -1,30 +1,34 @@
-import React, { useState, useEffect } from "react";
-import { Box, Flex, Image, Button, IconButton } from "@chakra-ui/react";
-import { CloseIcon, HamburgerIcon } from "@chakra-ui/icons";
+import React, { useEffect } from "react";
+import {
+  Box,
+  Flex,
+  Image,
+  Button,
+  IconButton,
+  Drawer,
+  DrawerBody,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+} from "@chakra-ui/react";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 import debounce from "lodash/debounce";
 import LoginLogoutButton from "./LoginLogoutButton";
+import { useParentContext } from "../contexts/parentContext";
 
 const Navbar = () => {
-  const [displayMenu, setDisplayMenu] = useState("none");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // Changing hamburger's display value
-  const toggleMenu = () => {
-    setDisplayMenu(displayMenu === "none" ? "flex" : "none");
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const { isLargeScreen, setIsLargeScreen, isOpen, onOpen, onClose } =
+    useParentContext();
 
   // Function to handle window resize
   const handleResize = debounce(() => {
-    // Setting displayMenu to none for larger screens
-    if (window.innerWidth > 768) {
-      setDisplayMenu("none");
-    }
+    setIsLargeScreen(window.innerWidth > 768);
   }, 100);
 
   // Using useEffect to add event listener on component mount and remove on unmount
   useEffect(() => {
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -54,7 +58,7 @@ const Navbar = () => {
           </Box>
           <Flex
             className="link-container"
-            display={["none", "none", "flex", "flex"]}
+            display={isLargeScreen ? "flex" : "none"}
           >
             <Link to="/signup">
               <Button
@@ -93,82 +97,71 @@ const Navbar = () => {
               </Button>
             </Link>
           </Flex>
-          <Flex align="center" display={["none", "none", "flex", "flex"]}>
+          <Flex align="center" display={isLargeScreen ? "flex" : "none"}>
             <LoginLogoutButton />
           </Flex>
           <IconButton
-            aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
+            aria-label="Open Menu"
             size="lg"
             mr={2}
-            icon={isMenuOpen ? <CloseIcon /> : <HamburgerIcon />}
-            display={["flex", "flex", "none", "none"]}
-            onClick={toggleMenu}
-            aria-expanded={isMenuOpen ? "expanded" : "collapsed"}
+            icon={<HamburgerIcon />}
+            display={isLargeScreen ? "none" : "flex"}
+            onClick={onOpen}
           />
-          <Flex
-            w="100vw"
-            zIndex={20}
-            h="100vh"
-            bgColor="#141925"
-            pos="fixed"
-            top="0"
-            left="0"
-            overflowY="auto"
-            flexDir="column"
-            display={displayMenu}
-          >
-            <Flex justify="flex-end">
-              <IconButton
-                mt={4}
-                mr={10}
-                aria-label="Close Menu"
-                size="lg"
-                icon={<CloseIcon />}
-                onClick={toggleMenu}
-              />
-            </Flex>
-            <Flex flexDir="column" align="center">
-              <Link to="/signup">
-                <Button
-                  variant="ghost"
-                  color="white"
-                  _hover={{ bg: "white", color: "black" }}
-                  aria-label="Get Started"
-                  my={5}
-                  w="100%"
-                >
-                  Get Started
-                </Button>
-              </Link>
-              <Link to="/about">
-                <Button
-                  variant="ghost"
-                  color="white"
-                  _hover={{ bg: "white", color: "black" }}
-                  aria-label="About"
-                  my={5}
-                  w="100%"
-                >
-                  About
-                </Button>
-              </Link>
-              <Link to="/write-us">
-                <Button
-                  variant="ghost"
-                  color="white"
-                  _hover={{ bg: "white", color: "black" }}
-                  aria-label="Write Us"
-                  my={5}
-                  w="100%"
-                >
-                  Write Us
-                </Button>
-              </Link>
-              <LoginLogoutButton />
-            </Flex>
-          </Flex>
         </Flex>
       </header>
+
+      <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+        <DrawerOverlay>
+          <DrawerContent bgColor={"#141925"} color={"white"}>
+            <DrawerCloseButton mt={2} mr={4} size={"lg"} />
+            <DrawerBody pt={12}>
+              <Flex flexDir="column" align="center">
+                <Link to="/signup">
+                  <Button
+                    variant="ghost"
+                    color="white"
+                    _hover={{ bg: "white", color: "black" }}
+                    aria-label="Get Started"
+                    my={5}
+                    w="100%"
+                    onClick={onClose}
+                  >
+                    Get Started
+                  </Button>
+                </Link>
+                <Link to="/about">
+                  <Button
+                    variant="ghost"
+                    color="white"
+                    _hover={{ bg: "white", color: "black" }}
+                    aria-label="About"
+                    my={5}
+                    w="100%"
+                    onClick={onClose}
+                  >
+                    About
+                  </Button>
+                </Link>
+                <Link to="/write-us">
+                  <Button
+                    variant="ghost"
+                    color="white"
+                    _hover={{ bg: "white", color: "black" }}
+                    aria-label="Write Us"
+                    my={5}
+                    w="100%"
+                    onClick={onClose}
+                  >
+                    Write Us
+                  </Button>
+                </Link>
+                <LoginLogoutButton />
+              </Flex>
+            </DrawerBody>
+          </DrawerContent>
+        </DrawerOverlay>
+      </Drawer>
     </>
   );
 };
