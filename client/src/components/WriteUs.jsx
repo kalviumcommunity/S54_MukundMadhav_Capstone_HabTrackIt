@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import emailjs from "@emailjs/browser";
+import { TailSpin } from "react-loader-spinner";
 import {
   Flex,
   Image,
@@ -22,9 +23,19 @@ import {
 
 const WriteUs = () => {
   const [loading, setLoading] = useState(false);
+  const [emailInitialized, setEmailInitialized] = useState(false);
 
   useEffect(() => {
-    emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+    const initEmailJs = () => {
+      try {
+        emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+        setEmailInitialized(true);
+      } catch (error) {
+        console.error("Failed to initialize EmailJS:", error);
+      }
+    };
+
+    initEmailJs();
   }, []);
 
   const {
@@ -54,7 +65,7 @@ const WriteUs = () => {
           message: query,
         };
 
-        await emailjs.send(serviceId, templateId, templeteParams);
+        await sendEmail(serviceId, templateId, templeteParams);
 
         toast({
           title: "Message Sent Successfully",
@@ -95,6 +106,15 @@ const WriteUs = () => {
     }
   };
 
+  const sendEmail = async (serviceId, templateId, templateParams) => {
+    try {
+      await emailjs.send(serviceId, templateId, templateParams);
+    } catch (error) {
+      console.error("Failed to send email:", error);
+      throw new Error("Failed to send email");
+    }
+  };
+
   return (
     <>
       <Box bgGradient="linear(to-br,#1B1745,#233249)" minH="calc(100vh - 5em)">
@@ -122,75 +142,89 @@ const WriteUs = () => {
                       Write to us!
                     </Heading>
                     <Flex rounded={"lg"} flexDir={"column"} w="100%">
-                      <form onSubmit={handleSubmit(onSubmit)}>
-                        <SimpleGrid
-                          columns={1}
-                          spacingY={3}
-                          justifyContent={"center"}
-                        >
-                          <FormControl id="usernameOrEmail">
-                            <FormLabel>Username or Email</FormLabel>
-                            <Input
-                              placeholder="Enter your Username or Email"
-                              _placeholder={{ fontSize: "2vh" }}
-                              bg={"rgba(34, 50, 73, 0.65)"}
-                              w={"100%"}
-                              border={"none"}
-                              {...register("usernameOrEmail", {
-                                required: "This field is required",
-                                minLength: {
-                                  value: 3,
-                                  message:
-                                    "Input must be at least 3 characters long",
-                                },
-                              })}
-                            />
-                            {errors.usernameOrEmail && (
-                              <Text color="red.500">
-                                {errors.usernameOrEmail.message}
-                              </Text>
-                            )}
-                          </FormControl>
-
-                          <FormControl id="query">
-                            <FormLabel>Query</FormLabel>
-                            <Textarea
-                              placeholder="Enter your Query"
-                              bg={"rgba(34, 50, 73, 0.65)"}
-                              _placeholder={{ fontSize: "2vh" }}
-                              border={"none"}
-                              w={["72vw", "37vw", "24vw", "25vw"]}
-                              {...register("query", {
-                                required: "This field is required",
-                                minLength: {
-                                  value: 5,
-                                  message:
-                                    "Your query must be at least 5 characters long",
-                                },
-                              })}
-                            />
-                            {errors.query && (
-                              <Text color="red.500">
-                                {errors.query.message}
-                              </Text>
-                            )}
-                          </FormControl>
-                          <Button
-                            color={"white"}
-                            type="submit"
-                            maxW={"fit-content"}
-                            justifySelf={"center"}
-                            disabled={!isValid}
-                            fontWeight={"bold"}
-                            fontSize={"3vh"}
-                            variant={"solid"}
-                            _hover={{ bgColor: "#2985DC" }}
-                            bgColor={"#316AA0"}
+                      {emailInitialized ? (
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                          <SimpleGrid
+                            columns={1}
+                            spacingY={3}
+                            justifyContent={"center"}
                           >
-                            Submit
-                          </Button>
-                        </SimpleGrid>
-                      </form>
+                            <FormControl id="usernameOrEmail">
+                              <FormLabel>Username or Email</FormLabel>
+                              <Input
+                                placeholder="Enter your Username or Email"
+                                _placeholder={{ fontSize: "2vh" }}
+                                bg={"rgba(34, 50, 73, 0.65)"}
+                                w={"100%"}
+                                border={"none"}
+                                {...register("usernameOrEmail", {
+                                  required: "This field is required",
+                                  minLength: {
+                                    value: 3,
+                                    message:
+                                      "Input must be at least 3 characters long",
+                                  },
+                                })}
+                              />
+                              {errors.usernameOrEmail && (
+                                <Text color="red.500">
+                                  {errors.usernameOrEmail.message}
+                                </Text>
+                              )}
+                            </FormControl>
+
+                            <FormControl id="query">
+                              <FormLabel>Query</FormLabel>
+                              <Textarea
+                                placeholder="Enter your Query"
+                                bg={"rgba(34, 50, 73, 0.65)"}
+                                _placeholder={{ fontSize: "2vh" }}
+                                border={"none"}
+                                w={["72vw", "37vw", "24vw", "25vw"]}
+                                {...register("query", {
+                                  required: "This field is required",
+                                  minLength: {
+                                    value: 5,
+                                    message:
+                                      "Your query must be at least 5 characters long",
+                                  },
+                                })}
+                              />
+                              {errors.query && (
+                                <Text color="red.500">
+                                  {errors.query.message}
+                                </Text>
+                              )}
+                            </FormControl>
+                            <Button
+                              color={"white"}
+                              type="submit"
+                              maxW={"fit-content"}
+                              justifySelf={"center"}
+                              disabled={!isValid || loading}
+                              fontWeight={"bold"}
+                              fontSize={"3vh"}
+                              variant={"solid"}
+                              _hover={{ bgColor: "#2985DC" }}
+                              bgColor={"#316AA0"}
+                            >
+                              {loading ? (
+                                <TailSpin
+                                  color={"white"}
+                                  height={30}
+                                  width={30}
+                                />
+                              ) : (
+                                "Submit"
+                              )}
+                            </Button>
+                          </SimpleGrid>
+                        </form>
+                      ) : (
+                        <Text align={"center"}>
+                          Initializing email service...
+                        </Text>
+                      )}
                     </Flex>
                   </Stack>
                 </Container>
