@@ -46,7 +46,9 @@ export default function SignupForm() {
     } catch (error) {
       toast({
         title: "User Sign Up failed.",
-        description: error.response ? `${error.response.data}` : "An error occurred",
+        description: error.response
+          ? `${error.response.data}`
+          : "An error occurred",
         status: "error",
         duration: 2000,
         isClosable: true,
@@ -77,7 +79,7 @@ export default function SignupForm() {
   const onSubmit = async (values) => {
     try {
       const response = await axios.post(
-        "https://habtrackit.onrender.com/signup",
+        `${import.meta.env.VITE_API_URL}/signup`,
         values
       );
       setUser({ displayName: response.data.username });
@@ -101,7 +103,9 @@ export default function SignupForm() {
       setIsUserLoggedIn(false);
       toast({
         title: "User Sign Up failed.",
-        description: error.response ? `${error.response.data}` : "An error occurred",
+        description: error.response
+          ? `${error.response.data}`
+          : "An error occurred",
         status: "error",
         duration: 2000,
         isClosable: true,

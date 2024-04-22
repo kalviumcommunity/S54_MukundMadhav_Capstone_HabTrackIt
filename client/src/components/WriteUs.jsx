@@ -52,7 +52,7 @@ const WriteUs = () => {
       setLoading(true);
       const { usernameOrEmail, query } = values;
       const response = await axios.post(
-        "https://habtrackit.onrender.com/existing-user",
+        `${import.meta.env.VITE_API_URL}/existing-user`,
         {
           usernameOrEmail,
         }
