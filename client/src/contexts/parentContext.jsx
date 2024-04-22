@@ -1,15 +1,24 @@
-import React, { useState, createContext } from "react";
+import React, { useState, createContext, useContext } from "react";
+import { useDisclosure } from "@chakra-ui/react";
 
 const ParentContext = createContext();
 
-const ContextProvider = ({ children }) => {
+export const ContextProvider = ({ children }) => {
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(false); // For Navbar
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const [user, setUser] = useState(null);
   const value = {
     isSignedIn,
     setIsSignedIn,
     user,
     setUser,
+    isLargeScreen,
+    setIsLargeScreen,
+    isOpen,
+    onOpen,
+    onClose,
   };
 
   return (
@@ -17,4 +26,6 @@ const ContextProvider = ({ children }) => {
   );
 };
 
-export default ContextProvider;
+export const useParentContext = () => {
+  return useContext(ParentContext);
+};

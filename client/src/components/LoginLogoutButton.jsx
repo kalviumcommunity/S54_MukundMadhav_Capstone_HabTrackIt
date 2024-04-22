@@ -1,10 +1,12 @@
 import React from "react";
 import { Button } from "@chakra-ui/react";
 import { useAuth } from "../contexts/authContext";
+import { useParentContext } from "../contexts/parentContext";
 import { Link } from "react-router-dom";
 
 const LoginLogoutButton = () => {
   const { isUserLoggedIn, logOut, setIsUserLoggedIn } = useAuth();
+  const { onClose } = useParentContext();
 
   const handleSignOut = async () => {
     try {
@@ -35,6 +37,7 @@ const LoginLogoutButton = () => {
         color="white"
         bg="#4D5097"
         fontWeight="700"
+        onClick={onClose}
       >
         Login
       </Button>
