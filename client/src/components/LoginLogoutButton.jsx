@@ -2,11 +2,18 @@ import React from "react";
 import { Button } from "@chakra-ui/react";
 import { useAuth } from "../contexts/authContext";
 import { useParentContext } from "../contexts/parentContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginLogoutButton = () => {
   const { isUserLoggedIn, logOut, setIsUserLoggedIn } = useAuth();
   const { onClose } = useParentContext();
+  const navigate = useNavigate();
+
+  const logOutFunction = () => {
+    handleSignOut();
+    onClose();
+    navigate("/");
+  };
 
   const handleSignOut = async () => {
     try {
@@ -25,7 +32,7 @@ const LoginLogoutButton = () => {
       color="white"
       bg="#4D5097"
       fontWeight="700"
-      onClick={handleSignOut}
+      onClick={logOutFunction}
     >
       Logout
     </Button>
