@@ -1,10 +1,14 @@
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const { throttle } = require("lodash");
+const jwt = require("jsonwebtoken");
 
 const createUser = async (req, res) => {
   try {
     let { username, email, password } = req.body;
+    if (!password) {
+      password = process.env.DEFAULT_PASSWORD;
+    }
     const existingUser = await userModel.findOne({
       $or: [{ username }, { email }],
     });
@@ -15,15 +19,20 @@ const createUser = async (req, res) => {
       } else if (existingUser.email === email) {
         message = "User already exists with this email!";
       }
-      return res.status(400).send(message);
+      return res.status(400).json({ message: message });
     }
 
     const salt = await bcrypt.genSalt(12);
     password = await bcrypt.hash(password, salt);
 
-    const newUser = await userModel.create({ username, email, password });
+    const token = jwt.sign({ email }, process.env.JWT_SECRET);
+
+    const newUser = await userModel.create({ username, email, password, token });
+    // console.log(newUser);
     if (newUser) {
-      return res.status(201).json(newUser);
+      return res
+        .status(201)
+        .json({ message: "User Signed up successfully!", token: token });
     } else {
       return res.status(400).json({ error: "Failed to sign up new user." });
     }
@@ -35,28 +44,35 @@ const createUser = async (req, res) => {
   }
 };
 
-const findUser = throttle(async (req, res) => {
-  try {
-    const { usernameOrEmail, password } = req.body;
-    const user = await userModel.findOne({
-      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
-    });
-    if (!user) {
-      return res.status(401).json("No user found!");
+const findUser = throttle(
+  async (req, res) => {
+    try {
+      const { usernameOrEmail, password } = req.body;
+      const user = await userModel.findOne({
+        $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+      });
+      if (!user) {
+        return res.status(401).json({ message: "No user found!" });
+      }
+      const isPasswordCorrect = await bcrypt.compare(password, user.password);
+      if (isPasswordCorrect) {
+        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
+        return res
+          .status(200)
+          .json({ message: "User logged in successfully!", token: token });
+      } else {
+        return res.status(401).json("Incorrect password!");
+      }
+    } catch (error) {
+      console.error("Error occurred while logging in user:", error);
+      return res
+        .status(500)
+        .json({ error: "Internal Server Error", message: error.message });
     }
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (isPasswordCorrect) {
-      return res.status(200).json({ user });
-    } else {
-      return res.status(401).json("Incorrect password!");
-    }
-  } catch (error) {
-    console.error("Error occurred while logging in user:", error);
-    return res
-      .status(500)
-      .json({ error: "Internal Server Error", message: error.message });
-  }
-}, 10000, { trailing: false });
+  },
+  10000,
+  { trailing: false }
+);
 
 const ifUserExists = async (req, res) => {
   try {

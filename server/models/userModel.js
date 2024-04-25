@@ -16,6 +16,9 @@ const userSchema = new mongoose.Schema({
     minlength: 8,
     required: true,
   },
+  token: {
+    type: String,
+  },
   signedUpAt: {
     type: Date,
     default: Date.now,

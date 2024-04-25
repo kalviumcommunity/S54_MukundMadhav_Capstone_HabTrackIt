@@ -24,11 +24,12 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../contexts/authContext";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function SignupForm() {
   const toast = useToast();
   const navigate = useNavigate();
-  const { signInWithGoogle, setUser, setIsUserLoggedIn } = useAuth();
+  const { signInWithGoogle, setIsUserLoggedIn } = useAuth();
 
   const handleGoogleSignIn = async () => {
     try {
@@ -77,17 +78,14 @@ export default function SignupForm() {
   const handleShowClick2 = () => setShowConfirmPassword(!showConfirmPassword);
 
   const onSubmit = async (values) => {
+    const { username, email, password } = values;
+    const data = { username, email, password };
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/signup`,
-        values
+        data
       );
-      setUser({ displayName: response.data.username });
-      window.sessionStorage.setItem(
-        "user",
-        JSON.stringify({ displayName: response.data.username })
-      );
-
+      Cookies.set("token", response.data.token);
       setIsUserLoggedIn(true);
       toast({
         title: "Sign Up Successful.",
@@ -100,11 +98,12 @@ export default function SignupForm() {
         navigate("/");
       }, 2000);
     } catch (error) {
+      console.log(error);
       setIsUserLoggedIn(false);
       toast({
         title: "User Sign Up failed.",
         description: error.response
-          ? `${error.response.data}`
+          ? `${error.response.data.message}`
           : "An error occurred",
         status: "error",
         duration: 2000,
