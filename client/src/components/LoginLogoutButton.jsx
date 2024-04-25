@@ -3,6 +3,7 @@ import { Button } from "@chakra-ui/react";
 import { useAuth } from "../contexts/authContext";
 import { useParentContext } from "../contexts/parentContext";
 import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const LoginLogoutButton = () => {
   const { isUserLoggedIn, logOut, setIsUserLoggedIn } = useAuth();
@@ -19,7 +20,7 @@ const LoginLogoutButton = () => {
     try {
       await logOut();
       setIsUserLoggedIn(false);
-      window.sessionStorage.removeItem("user");
+      Cookies.remove("token");
     } catch (error) {
       console.log(error);
     }

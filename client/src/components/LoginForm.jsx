@@ -24,9 +24,10 @@ import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../contexts/authContext";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function LoginForm() {
-  const { signInWithGoogle, setIsUserLoggedIn, setUser } = useAuth();
+  const { signInWithGoogle, setIsUserLoggedIn } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
   const usernameOrEmailId = useId();
@@ -76,11 +77,7 @@ export default function LoginForm() {
         `${import.meta.env.VITE_API_URL}/login`,
         values
       );
-      setUser({ displayName: response.data.user.username });
-      window.sessionStorage.setItem(
-        "user",
-        JSON.stringify({ displayName: response.data.user.username })
-      );
+      Cookies.set("token", response.data.token);
       setIsUserLoggedIn(true);
       setTimeout(() => {
         navigate("/");
@@ -95,7 +92,7 @@ export default function LoginForm() {
     } catch (error) {
       setIsUserLoggedIn(false);
       toast({
-        title: "User Sign Up failed.",
+        title: "User Sign In failed.",
         description: error.response
           ? `${error.response.data}`
           : "An error occurred",
