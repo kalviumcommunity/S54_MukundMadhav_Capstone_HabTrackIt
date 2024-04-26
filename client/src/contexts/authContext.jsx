@@ -55,7 +55,7 @@ export const AuthContextProvider = ({ children }) => {
             // If user exists, set the user state and token and exit
             setUsername(auth.currentUser.displayName);
             setEmail(auth.currentUser.email);
-            Cookies.set("token", check.data.user.token);
+            Cookies.set("token", check.data.token);
             setIsUserLoggedIn(true);
             return;
           } catch (error) {
