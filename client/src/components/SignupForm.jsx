@@ -25,11 +25,13 @@ import { useAuth } from "../contexts/authContext";
 import { FcGoogle } from "react-icons/fc";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { TailSpin } from "react-loader-spinner";
 
 export default function SignupForm() {
   const toast = useToast();
   const navigate = useNavigate();
   const { signInWithGoogle, setIsUserLoggedIn } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -93,6 +95,7 @@ export default function SignupForm() {
     const { username, email, password } = values;
     const data = { username, email, password };
     try {
+      setLoading(true);
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/signup`,
         data
@@ -121,6 +124,8 @@ export default function SignupForm() {
         duration: 2000,
         isClosable: true,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -277,7 +282,11 @@ export default function SignupForm() {
                   _hover={{ bgColor: "#2985DC" }}
                   bgColor={"#316AA0"}
                 >
-                  Sign Up
+                  {loading ? (
+                    <TailSpin color={"white"} height={30} width={30} />
+                  ) : (
+                    "Sign Up"
+                  )}
                 </Button>
               </SimpleGrid>
             </form>
