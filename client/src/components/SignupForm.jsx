@@ -33,17 +33,29 @@ export default function SignupForm() {
 
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithGoogle();
-      toast({
-        title: "Sign Up Successful.",
-        description: "Redirecting to homepage.",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
+      const result = await signInWithGoogle();
+      if (result.user) {
+        // User signed up successfully
+        toast({
+          title: "Sign Up Successful.",
+          description: "Redirecting to homepage.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      } else {
+        // User cancelled the sign-up process
+        toast({
+          title: "Sign Up Cancelled.",
+          description: "You cancelled the sign-up process.",
+          status: "info",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
     } catch (error) {
       toast({
         title: "User Sign Up failed.",

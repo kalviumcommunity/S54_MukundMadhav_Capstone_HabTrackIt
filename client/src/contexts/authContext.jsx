@@ -27,11 +27,11 @@ export const AuthContextProvider = ({ children }) => {
         .toLowerCase()
         .replace(/\s+/g, ""); // Remove spaces and convert to lowercase
       uniqueUsername += Math.floor(Math.random() * 1000); // Add a random number to make it unique
-      console.log(auth);
 
       setUsername(uniqueUsername);
       setEmail(auth.currentUser.email);
       setIsUserLoggedIn(true);
+      return userCredential;
     } catch (error) {
       setIsUserLoggedIn(false);
       return error;
