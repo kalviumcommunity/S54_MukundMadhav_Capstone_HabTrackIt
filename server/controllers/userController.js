@@ -25,9 +25,11 @@ const createUser = async (req, res) => {
     const salt = await bcrypt.genSalt(12);
     password = await bcrypt.hash(password, salt);
 
-    const token = jwt.sign({ email }, process.env.JWT_SECRET);
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, {
+      expiresIn: "24h",
+    });
 
-    const newUser = await userModel.create({ username, email, password, token });
+    const newUser = await userModel.create({ username, email, password });
     // console.log(newUser);
     if (newUser) {
       return res
@@ -56,7 +58,9 @@ const findUser = throttle(
       }
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
       if (isPasswordCorrect) {
-        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET);
+        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+          expiresIn: "24h",
+        });
         return res
           .status(200)
           .json({ message: "User logged in successfully!", token: token });
@@ -84,10 +88,17 @@ const ifUserExists = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "No user found!" });
     } else {
-      return res.status(200).json({ user });
+      const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+        expiresIn: "24h",
+      });
+      // console.log(token)
+      return res.status(200).json({
+        user: { username: user.username, email: user.email },
+        token: token,
+      });
     }
   } catch (error) {
-    console.error("Error occurred while logging in user:", error);
+    console.error("Error occurred while finding user existance:", error);
     return res
       .status(500)
       .json({ error: "Internal Server Error", message: error.message });
