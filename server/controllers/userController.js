@@ -26,7 +26,7 @@ const createUser = async (req, res) => {
     password = await bcrypt.hash(password, salt);
 
     const token = jwt.sign({ email }, process.env.JWT_SECRET, {
-      expiresIn: "24h",
+      expiresIn: process.env.JWT_EXPIRATION,
     });
 
     const newUser = await userModel.create({ username, email, password });
@@ -59,7 +59,7 @@ const findUser = throttle(
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
       if (isPasswordCorrect) {
         const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-          expiresIn: "24h",
+          expiresIn: process.env.JWT_EXPIRATION,
         });
         return res
           .status(200)
@@ -89,7 +89,7 @@ const ifUserExists = async (req, res) => {
       return res.status(404).json({ message: "No user found!" });
     } else {
       const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-        expiresIn: "24h",
+        expiresIn: process.env.JWT_EXPIRATION,
       });
       // console.log(token)
       return res.status(200).json({
