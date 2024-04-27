@@ -93,7 +93,11 @@ const ifUserExists = async (req, res) => {
       });
       // console.log(token)
       return res.status(200).json({
-        user: { username: user.username, email: user.email },
+        user: {
+          username: user.username,
+          email: user.email,
+          profilePicture: user.profilePicture,
+        },
         token: token,
       });
     }
@@ -137,4 +141,42 @@ const updateUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, findUser, ifUserExists, updateUser };
+const updateUserProfilePicture = async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    // If token is null, return Unauthorized error
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: Missing token" });
+    }
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const email = decoded.email;
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    // Update the profile picture
+    user.profilePicture = req.body.profilePicture;
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ message: "Profile picture updated successfully!" });
+  } catch (error) {
+    console.error("Error occurred while updating profile picture:", error);
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", message: error.message });
+  }
+};
+
+module.exports = {
+  createUser,
+  findUser,
+  ifUserExists,
+  updateUser,
+  updateUserProfilePicture,
+};

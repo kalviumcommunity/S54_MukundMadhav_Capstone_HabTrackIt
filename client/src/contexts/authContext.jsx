@@ -15,6 +15,7 @@ export const AuthContextProvider = ({ children }) => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [profilePicture, setProfilePicture] = useState(null);
 
   const signInWithGoogle = async () => {
     try {
@@ -30,6 +31,7 @@ export const AuthContextProvider = ({ children }) => {
 
       setUsername(uniqueUsername);
       setEmail(auth.currentUser.email);
+      setProfilePicture(auth.currentUser.photoURL);
       setIsUserLoggedIn(true);
       return userCredential;
     } catch (error) {
@@ -55,6 +57,11 @@ export const AuthContextProvider = ({ children }) => {
             // If user exists, set the user state and token and exit
             setUsername(auth.currentUser.displayName);
             setEmail(auth.currentUser.email);
+            setProfilePicture(
+              check.data.user.profilePicture === null
+                ? auth.currentUser.photoURL
+                : check.data.user.profilePicture
+            );
             Cookies.set("token", check.data.token);
             setIsUserLoggedIn(true);
             return;
@@ -91,12 +98,28 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   useLayoutEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        const email = user.email;
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/existing-user`,
+          {
+            usernameOrEmail: email,
+          }
+        );
+        // console.log(response);
+        if (response.data.user.profilePicture === null) {
+          setProfilePicture(user.photoURL);
+        } else {
+          setProfilePicture(response.data.user.profilePicture);
+        }
         setIsUserLoggedIn(true);
+      } else {
+        setIsUserLoggedIn(false);
+        setProfilePicture(null);
       }
     });
-    return unsubscribe;
+    return () => unsubscribe();
   }, []);
 
   useLayoutEffect(() => {
@@ -113,6 +136,7 @@ export const AuthContextProvider = ({ children }) => {
         logOut,
         isUserLoggedIn,
         setIsUserLoggedIn,
+        profilePicture,
       }}
     >
       {children}
