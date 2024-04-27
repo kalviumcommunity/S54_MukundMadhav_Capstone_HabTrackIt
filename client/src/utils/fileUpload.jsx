@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
+import { useToast } from "@chakra-ui/react";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { storage } from "../firebase/firebase";
 import Cookies from "js-cookie";
 
 const FileUpload = ({ file }) => {
+  const toast = useToast();
   const handleUpload = async () => {
     try {
       if (!file) {
@@ -26,13 +28,34 @@ const FileUpload = ({ file }) => {
             },
           }
         );
+        toast({
+          title: "Profile Picture uploaded successfully",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       } catch (error) {
         console.error("Error updating profile picture:", error);
+        toast({
+          title: "Error updating profile picture",
+          description: `${error.message}`,
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
       }
-      alert("Profile Picture uploaded successfully");
-      window.location.reload();
     } catch (error) {
       console.error("Error uploading image:", error);
+      toast({
+        title: "Error uploading image",
+        description: `${error.message}`,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
     }
   };
 

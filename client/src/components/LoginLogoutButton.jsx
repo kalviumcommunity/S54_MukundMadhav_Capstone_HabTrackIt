@@ -26,6 +26,7 @@ const LoginLogoutButton = () => {
       await logOut();
       setIsUserLoggedIn(false);
       Cookies.remove("token");
+      navigate("/");
     } catch (error) {
       console.log(error);
     }

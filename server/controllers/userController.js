@@ -150,7 +150,13 @@ const updateUserProfilePicture = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized: Missing token" });
     }
     // Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    }
     const email = decoded.email;
 
     const user = await userModel.findOne({ email });
