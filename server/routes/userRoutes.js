@@ -6,6 +6,7 @@ const {
   findUser,
   updateUser,
   ifUserExists,
+  updateUserProfilePicture,
 } = require("../controllers/userController");
 
 const userValidator = require("../middlewares/userValidator");
@@ -15,5 +16,6 @@ userRouter.post("/login", findUser);
 userRouter.post("/existing-user", ifUserExists);
 
 userRouter.put("/reset-password", updateUser);
+userRouter.put("/update-profile-picture", updateUserProfilePicture);
 
 module.exports = userRouter;
