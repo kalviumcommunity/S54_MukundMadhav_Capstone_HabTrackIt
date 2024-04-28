@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useLayoutEffect } from "react";
 import {
   Box,
   Flex,
@@ -26,8 +26,8 @@ const Navbar = () => {
     setIsLargeScreen(window.innerWidth > 768);
   }, 100);
 
-  // Using useEffect to add event listener on component mount and remove on unmount
-  useEffect(() => {
+  // Using useLayoutEffect to add event listener on component mount and remove on unmount
+  useLayoutEffect(() => {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => {
@@ -43,19 +43,33 @@ const Navbar = () => {
           bgColor="#141925"
           align="center"
           justifyContent="space-between"
-          px="2rem"
+          px={["1rem", "2rem"]}
           h="5em"
         >
-          <Box className="image-container">
-            <Link to="/">
-              <Image
-                w="170px"
-                h="53px"
-                src="./HabTrackIt Logo.svg"
-                alt="HabTrackIt Logo"
-              />
-            </Link>
-          </Box>
+          <Flex justifyContent={"space-around"} alignItems={"center"}>
+            {/* Hamburger menu for small screens */}
+            <IconButton
+              aria-label="Open Menu"
+              size="lg"
+              mr={4}
+              icon={<HamburgerIcon />}
+              display={isLargeScreen ? "none" : "flex"}
+              onClick={onOpen}
+            />
+
+            <Box className="image-container">
+              <Link to="/">
+                <Image
+                  w="170px"
+                  h="53px"
+                  src="./HabTrackIt Logo.svg"
+                  alt="HabTrackIt Logo"
+                />
+              </Link>
+            </Box>
+          </Flex>
+
+          {/* Menu items for large screens */}
           <Flex
             className="link-container"
             display={isLargeScreen ? "flex" : "none"}
@@ -97,34 +111,29 @@ const Navbar = () => {
               </Button>
             </Link>
           </Flex>
-          <Flex align="center" display={isLargeScreen ? "flex" : "none"}>
+          <Flex align="center">
             <LoginLogoutButton />
           </Flex>
-          <IconButton
-            aria-label="Open Menu"
-            size="lg"
-            mr={2}
-            icon={<HamburgerIcon />}
-            display={isLargeScreen ? "none" : "flex"}
-            onClick={onOpen}
-          />
         </Flex>
       </header>
 
-      <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
+      <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
         <DrawerOverlay>
           <DrawerContent bgColor={"#141925"} color={"white"}>
             <DrawerCloseButton mt={2} mr={4} size={"lg"} />
-            <DrawerBody pt={12}>
-              <Flex flexDir="column" align="center">
+            <DrawerBody pt={16}>
+              <Flex
+                flexDir="column"
+                alignItems={"center"}
+                justifyContent={"center"}
+              >
                 <Link to="/signup">
                   <Button
                     variant="ghost"
                     color="white"
                     _hover={{ bg: "white", color: "black" }}
                     aria-label="Get Started"
-                    my={5}
-                    w="100%"
+                    my={2}
                     onClick={onClose}
                   >
                     Get Started
@@ -136,8 +145,7 @@ const Navbar = () => {
                     color="white"
                     _hover={{ bg: "white", color: "black" }}
                     aria-label="About"
-                    my={5}
-                    w="100%"
+                    my={2}
                     onClick={onClose}
                   >
                     About
@@ -149,14 +157,12 @@ const Navbar = () => {
                     color="white"
                     _hover={{ bg: "white", color: "black" }}
                     aria-label="Write Us"
-                    my={5}
-                    w="100%"
+                    my={2}
                     onClick={onClose}
                   >
                     Write Us
                   </Button>
                 </Link>
-                <LoginLogoutButton />
               </Flex>
             </DrawerBody>
           </DrawerContent>
