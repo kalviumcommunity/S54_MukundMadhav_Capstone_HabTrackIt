@@ -20,6 +20,7 @@ const LoginLogoutButton = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef();
+  const menuButtonRef = useRef();
 
   const handleSignOut = async () => {
     try {
@@ -33,17 +34,21 @@ const LoginLogoutButton = () => {
   };
 
   const handleMenuToggle = () => setIsOpen(!isOpen);
-  const handleMenuItemClick = () => setIsOpen(false); // Close menu on item click
+
+  const handleMenuItemClick = () => setIsOpen(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        !menuButtonRef.current.contains(event.target)
+      ) {
         setIsOpen(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -58,8 +63,9 @@ const LoginLogoutButton = () => {
         color="white"
         fontWeight="700"
         onClick={handleMenuToggle}
+        ref={menuButtonRef}
       >
-        <Avatar src={`${profilePicture}`} />
+        <Avatar src={`${profilePicture}`} onClick={handleMenuToggle} />
       </MenuButton>
       <MenuList ref={menuRef}>
         <MenuItem
@@ -95,5 +101,4 @@ const LoginLogoutButton = () => {
     </Link>
   );
 };
-
 export default LoginLogoutButton;
