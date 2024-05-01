@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const createUser = async (req, res) => {
   try {
-    let { username, email, password } = req.body;
+    let { username, email, password, profilePicture } = req.body;
     if (!password) {
       password = process.env.DEFAULT_PASSWORD;
     }
@@ -29,7 +29,7 @@ const createUser = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRATION,
     });
 
-    const newUser = await userModel.create({ username, email, password });
+    const newUser = await userModel.create({ username, email, password, profilePicture });
     // console.log(newUser);
     if (newUser) {
       return res
@@ -102,7 +102,42 @@ const ifUserExists = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error occurred while finding user existance:", error);
+    console.error("Error occurred while finding user existence:", error);
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", message: error.message });
+  }
+};
+
+const findUserAndSendData = async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+    // If token is null, return Unauthorized error
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: Missing token" });
+    }
+    // Verify the token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      console.error("Error decoding token:", error);
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    }
+    const email = decoded.email;
+
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    return res.status(200).json({
+      username: user.username,
+      email: user.email,
+      profilePicture: user.profilePicture,
+    });
+  } catch (error) {
+    console.error("Error occurred while finding user:", error);
     return res
       .status(500)
       .json({ error: "Internal Server Error", message: error.message });
@@ -185,4 +220,5 @@ module.exports = {
   ifUserExists,
   updateUser,
   updateUserProfilePicture,
+  findUserAndSendData
 };

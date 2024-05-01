@@ -1,4 +1,4 @@
-import React, { useState, useRef, useId } from "react";
+import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -23,14 +23,12 @@ import {
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../contexts/authContext";
 import { FcGoogle } from "react-icons/fc";
-import axios from "axios";
-import Cookies from "js-cookie";
 import { TailSpin } from "react-loader-spinner";
 
 export default function SignupForm() {
   const toast = useToast();
   const navigate = useNavigate();
-  const { signInWithGoogle, setIsUserLoggedIn } = useAuth();
+  const { signInWithGoogle, signUpWithEmailAndPassword } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
@@ -48,6 +46,14 @@ export default function SignupForm() {
         setTimeout(() => {
           navigate("/");
         }, 2000);
+      } else if (result.code === "ERR_NETWORK") {
+        toast({
+          title: "Network Error.",
+          description: "Internal Server Error. Please try again later.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
       } else {
         // User cancelled the sign-up process
         toast({
@@ -78,10 +84,10 @@ export default function SignupForm() {
     watch,
   } = useForm({ mode: "onChange" });
 
-  const confirmPasswordId = useId();
-  const emailId = useId();
-  const passwordId = useId();
-  const usernameId = useId();
+  const confirmPasswordId = useRef(null);
+  const emailId = useRef(null);
+  const passwordId = useRef(null);
+  const usernameId = useRef(null);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -93,28 +99,45 @@ export default function SignupForm() {
 
   const onSubmit = async (values) => {
     const { username, email, password } = values;
-    const data = { username, email, password };
     try {
       setLoading(true);
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/signup`,
-        data
+      const result = await signUpWithEmailAndPassword(
+        email,
+        password,
+        username
       );
-      Cookies.set("token", response.data.token);
-      setIsUserLoggedIn(true);
-      toast({
-        title: "Sign Up Successful.",
-        description: "Redirecting to homepage.",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
+      // console.log(result);
+      if (result.status === 201) {
+        toast({
+          title: "Sign Up Successful.",
+          description: "Redirecting to homepage.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+        setTimeout(() => {
+          navigate("/");
+          window.location.reload();
+        }, 2000);
+      } else if (result.code === "ERR_NETWORK") {
+        toast({
+          title: "Network Error.",
+          description: "Internal Server Error. Please try again later.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Sign Up failed.",
+          description: result.response.data.message,
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
     } catch (error) {
-      console.log(error);
-      setIsUserLoggedIn(false);
+      // console.log(error);
       toast({
         title: "User Sign Up failed.",
         description: error.response
@@ -146,7 +169,7 @@ export default function SignupForm() {
           <Flex rounded={"lg"} minW={"20vw"} flexDir={"column"} w={"100%"}>
             <form onSubmit={handleSubmit(onSubmit)}>
               <SimpleGrid columns={1} spacingY={3} justifyContent={"center"}>
-                <FormControl id={usernameId}>
+                <FormControl id={usernameId.current}>
                   <FormLabel>Username</FormLabel>
                   <Input
                     placeholder="Enter your username"
@@ -169,7 +192,7 @@ export default function SignupForm() {
                   )}
                 </FormControl>
 
-                <FormControl id={emailId}>
+                <FormControl id={emailId.current}>
                   <FormLabel>Email Address</FormLabel>
                   <Input
                     placeholder="Enter your email address"
@@ -188,7 +211,7 @@ export default function SignupForm() {
                   )}
                 </FormControl>
 
-                <FormControl id={passwordId}>
+                <FormControl id={passwordId.current}>
                   <FormLabel>Password</FormLabel>
                   <InputGroup>
                     <Input
@@ -231,8 +254,7 @@ export default function SignupForm() {
                     <Text color="red.500">{errors.password.message}</Text>
                   )}
                 </FormControl>
-
-                <FormControl id={confirmPasswordId}>
+                <FormControl id={confirmPasswordId.current}>
                   <FormLabel>Confirm Password</FormLabel>
                   <InputGroup>
                     <Input

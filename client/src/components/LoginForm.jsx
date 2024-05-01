@@ -1,4 +1,4 @@
-import React, { useState, useRef, useId } from "react";
+import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -23,16 +23,14 @@ import {
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { useAuth } from "../contexts/authContext";
 import { FcGoogle } from "react-icons/fc";
-import axios from "axios";
-import Cookies from "js-cookie";
 import { TailSpin } from "react-loader-spinner";
 
 export default function LoginForm() {
-  const { signInWithGoogle, setIsUserLoggedIn } = useAuth();
+  const { signInWithGoogle, signInWithEmailAndPassword } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
-  const usernameOrEmailId = useId();
-  const passwordId = useId();
+  const usernameOrEmailId = useRef(null);
+  const passwordId = useRef(null);
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
@@ -40,13 +38,21 @@ export default function LoginForm() {
       const result = await signInWithGoogle();
       if (result.user) {
         // User signed in successfully
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
         toast({
           title: "Sign In Successful.",
           description: "Redirecting to homepage.",
           status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      } else if (result.code === "ERR_NETWORK") {
+        toast({
+          title: "Network Error.",
+          description: "Internal Server Error. Please try again later.",
+          status: "error",
           duration: 2000,
           isClosable: true,
         });
@@ -86,26 +92,43 @@ export default function LoginForm() {
   const handleShowClick = () => setShowPassword(!showPassword);
 
   const onSubmit = async (values) => {
+    const { usernameOrEmail, password } = values;
     try {
       setLoading(true);
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/login`,
-        values
+      const result = await signInWithEmailAndPassword(
+        usernameOrEmail,
+        password
       );
-      Cookies.set("token", response.data.token);
-      setIsUserLoggedIn(true);
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
-      toast({
-        title: "Sign In Successful.",
-        description: "Redirecting to homepage.",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      // console.log(result)
+      if (result.status === 200) {
+        toast({
+          title: "Sign In Successful.",
+          description: "Redirecting to homepage.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      } else if (result.code === "ERR_NETWORK") {
+        toast({
+          title: "Network Error.",
+          description: "Internal Server Error. Please try again later.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Sign In Failed.",
+          description: result.response.data.message,
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
     } catch (error) {
-      setIsUserLoggedIn(false);
       toast({
         title: "User Sign In failed.",
         description: error.response
@@ -137,7 +160,7 @@ export default function LoginForm() {
           <Flex rounded={"lg"} flexDir={"column"} w="100%">
             <form onSubmit={handleSubmit(onSubmit)}>
               <SimpleGrid columns={1} spacingY={3} justifyContent={"center"}>
-                <FormControl id={usernameOrEmailId}>
+                <FormControl id={usernameOrEmailId.current}>
                   <FormLabel>Username or Email</FormLabel>
                   <Input
                     placeholder="Enter your Username or Email"
@@ -158,8 +181,7 @@ export default function LoginForm() {
                     </Text>
                   )}
                 </FormControl>
-
-                <FormControl id={passwordId}>
+                <FormControl id={passwordId.current}>
                   <FormLabel>Password</FormLabel>
                   <InputGroup>
                     <Input

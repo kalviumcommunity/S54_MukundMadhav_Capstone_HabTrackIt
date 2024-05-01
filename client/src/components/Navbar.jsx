@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import {
   Box,
   Flex,
@@ -10,16 +10,16 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { Link } from "react-router-dom";
 import debounce from "lodash/debounce";
 import LoginLogoutButton from "./LoginLogoutButton";
-import { useParentContext } from "../contexts/parentContext";
 
 const Navbar = () => {
-  const { isLargeScreen, setIsLargeScreen, isOpen, onOpen, onClose } =
-    useParentContext();
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Function to handle window resize
   const handleResize = debounce(() => {

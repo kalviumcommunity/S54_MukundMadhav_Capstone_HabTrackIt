@@ -1,149 +1,173 @@
-import { useContext, createContext, useState, useLayoutEffect } from "react";
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-} from "firebase/auth";
+import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebase/firebase";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-const authContext = createContext();
+const AuthContext = createContext();
 
-export const AuthContextProvider = ({ children }) => {
-  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
+export const AuthProvider = ({ children }) => {
   const [email, setEmail] = useState("");
-  const [profilePicture, setProfilePicture] = useState(null);
+  const [username, setUsername] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token) {
+      fetchUserData(token);
+    }
+  }, []);
 
   const signInWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
     try {
-      const provider = new GoogleAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      const prevUsername = auth.currentUser.displayName;
-      // Generate a unique username
-      let uniqueUsername = prevUsername
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, ""); // Remove spaces and convert to lowercase
-      uniqueUsername += Math.floor(Math.random() * 1000); // Add a random number to make it unique
-
-      setUsername(uniqueUsername);
-      setEmail(auth.currentUser.email);
-      setProfilePicture(auth.currentUser.photoURL);
-      setIsUserLoggedIn(true);
-      return userCredential;
+      const result = await signInWithPopup(auth, provider);
+      const { displayName, email, photoURL } = result.user;
+      let username = displayName.trim().toLowerCase().replace(/\s+/g, "");
+      username += Math.floor(Math.random() * 1000);
+      let res = await signUpOrSignIn(email, username, photoURL);
+      // console.log("res: ", res);
+      return result;
     } catch (error) {
-      setIsUserLoggedIn(false);
       return error;
     }
   };
 
-  useLayoutEffect(() => {
-    const createGoogleUser = async () => {
-      try {
-        if (username && email) {
-          try {
-            // Check if the user already exists in the database
-            const check = await axios.post(
-              `${import.meta.env.VITE_API_URL}/existing-user`,
-              {
-                usernameOrEmail: email,
-              }
-            );
-            // console.log(check);
-
-            // If user exists, set the user state and token and exit
-            setUsername(auth.currentUser.displayName);
-            setEmail(auth.currentUser.email);
-            setProfilePicture(
-              check.data.user.profilePicture === null
-                ? auth.currentUser.photoURL
-                : check.data.user.profilePicture
-            );
-            Cookies.set("token", check.data.token);
-            setIsUserLoggedIn(true);
-            return;
-          } catch (error) {
-            // User doesn't exist, proceed to create a new user
-            console.log("User doesn't exist. Creating a new user.");
-          }
-
-          try {
-            const res = await axios.post(
-              `${import.meta.env.VITE_API_URL}/signup`,
-              {
-                username,
-                email,
-              }
-            );
-            // console.log(res);
-            Cookies.set("token", res.data.token);
-            setIsUserLoggedIn(true);
-          } catch (error) {
-            console.log("Error creating user:", error);
-          }
-        }
-      } catch (error) {
-        console.log("Error:", error);
-      }
-    };
-
-    createGoogleUser();
-  }, [username, email]);
-
-  const logOut = () => {
-    signOut(auth);
+  const signUpWithEmailAndPassword = async (email, password, username) => {
+    try {
+      const result = await signUpOrSignIn(email, username, null, password);
+      return result;
+    } catch (error) {
+      console.error("Error Signing up with Email and Password: ", error);
+      return error;
+    }
   };
 
-  useLayoutEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const email = user.email;
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/existing-user`,
+  const signInWithEmailAndPassword = async (email, password) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/login`,
+        {
+          usernameOrEmail: email,
+          password,
+        }
+      );
+      const { token } = response.data;
+      Cookies.set("token", token);
+      fetchUserData(token);
+      return response;
+    } catch (error) {
+      console.error("Error Signing in with Email and Password: ", error);
+      return error;
+    }
+  };
+
+  const signUpOrSignIn = async (
+    email,
+    username,
+    profilePicture,
+    password = null
+  ) => {
+    try {
+      var signupResponse = null;
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/identify-user`,
+        {
+          usernameOrEmail: email,
+        }
+      );
+
+      // User exists
+      if (response.status === 200) {
+        const { token } = response.data;
+        Cookies.set("token", token);
+        fetchUserData(token);
+        return response;
+      }
+
+      // User does not exist
+      if (response.status === 404) {
+        const signupResponse = await axios.post(
+          `${import.meta.env.VITE_API_URL}/signup`,
           {
-            usernameOrEmail: email,
+            email,
+            username,
+            profilePicture,
+            password,
           }
         );
-        // console.log(response);
-        if (response.data.user.profilePicture === null) {
-          setProfilePicture(user.photoURL);
-        } else {
-          setProfilePicture(response.data.user.profilePicture);
-        }
-        setIsUserLoggedIn(true);
-      } else {
-        setIsUserLoggedIn(false);
-        setProfilePicture(null);
+        console.log(signupResponse);
+        const { token } = signupResponse.data;
+        Cookies.set("token", token);
+        fetchUserData(token);
+        return signupResponse;
       }
-    });
-    return () => unsubscribe();
-  }, []);
+    } catch (error) {
+      signupResponse = await axios.post(
+        `${import.meta.env.VITE_API_URL}/signup`,
+        {
+          email,
+          username,
+          profilePicture,
+          password,
+        }
+      );
 
-  useLayoutEffect(() => {
-    const checkData = Cookies.get("token");
-    if (checkData) {
-      setIsUserLoggedIn(true);
+      const { token } = signupResponse.data;
+      Cookies.set("token", token);
+      fetchUserData(token);
+      return signupResponse;
     }
-  }, []);
+  };
+
+  const fetchUserData = async (token) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/existing-user`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const { email, username, profilePicture } = response.data;
+      setEmail(email);
+      setUsername(username);
+      setProfilePicture(profilePicture);
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error(`Error fetching user data: ${error}`);
+    }
+  };
+
+  const LogOutUser = () => {
+    Cookies.remove("token");
+    setEmail("");
+    setUsername("");
+    setProfilePicture("");
+    setIsLoggedIn(false);
+  };
 
   return (
-    <authContext.Provider
+    <AuthContext.Provider
       value={{
-        signInWithGoogle,
-        logOut,
-        isUserLoggedIn,
-        setIsUserLoggedIn,
+        email,
+        username,
         profilePicture,
+        isLoggedIn,
+        signInWithGoogle,
+        signUpWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        LogOutUser,
       }}
     >
       {children}
-    </authContext.Provider>
+    </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => {
-  return useContext(authContext);
+  return useContext(AuthContext);
 };

@@ -52,7 +52,7 @@ const WriteUs = () => {
       setLoading(true);
       const { usernameOrEmail, query } = values;
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/existing-user`,
+        `${import.meta.env.VITE_API_URL}/identify-user`,
         {
           usernameOrEmail,
         }
@@ -74,6 +74,9 @@ const WriteUs = () => {
           duration: 2000,
           isClosable: true,
         });
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       } else {
         toast({
           title: "An error occurred",

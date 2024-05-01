@@ -6,32 +6,19 @@ import {
   MenuList,
   MenuItem,
   Avatar,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { useAuth } from "../contexts/authContext";
-import { useParentContext } from "../contexts/parentContext";
 import { Link, useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 
 const LoginLogoutButton = () => {
-  const { isUserLoggedIn, logOut, setIsUserLoggedIn, profilePicture } =
-    useAuth();
-  const { onClose } = useParentContext();
+  const { isLoggedIn, LogOutUser, profilePicture } = useAuth();
+  const { onClose } = useDisclosure();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef();
   const menuButtonRef = useRef();
-
-  const handleSignOut = async () => {
-    try {
-      await logOut();
-      setIsUserLoggedIn(false);
-      Cookies.remove("token");
-      navigate("/");
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const handleMenuToggle = () => setIsOpen(!isOpen);
 
@@ -54,7 +41,7 @@ const LoginLogoutButton = () => {
     };
   }, []);
 
-  return isUserLoggedIn ? (
+  return isLoggedIn ? (
     <Menu isOpen={isOpen} onClose={() => setIsOpen(false)}>
       <MenuButton
         as={Button}
@@ -78,7 +65,8 @@ const LoginLogoutButton = () => {
         </MenuItem>
         <MenuItem
           onClick={() => {
-            handleSignOut();
+            LogOutUser();
+            navigate("/");
             handleMenuItemClick();
           }}
         >
