@@ -49,6 +49,7 @@ const Profile = () => {
           />
           <input
             type="file"
+            accept="image/png, image/jpeg, image/jpg"
             id="avatar-input"
             style={{ display: "none" }}
             onChange={handleAvatarChange}
