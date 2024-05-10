@@ -1,11 +1,12 @@
 import React from "react";
 import {
     Flex,
-    HStack,
     Heading,
     Image,
     Text,
     VStack,
+    IconButton,
+    Tooltip
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
@@ -54,9 +55,22 @@ const Dashboard = () => {
                         </VStack>
                     </Flex>
                 </VStack>
-                <Flex alignSelf={"flex-end"} pr={4}>
-                    <Link to={"/leaderboard"}><Image src="Leaderboard Icon.svg" /></Link>
-                    <Link><Image src="HabitAI Icon.svg" /></Link>
+                <Flex alignSelf={"flex-end"} justifyContent={"center"} pr={4}>
+                    <Tooltip label="Leaderboard" placement="bottom">
+                        <Link to="/leaderboard">
+                            <Image src="Leaderboard Icon.svg" alt="Leaderboard" />
+                        </Link>
+                    </Tooltip>
+
+                    <Tooltip label="HabitAI" placement="bottom">
+                        <IconButton
+                            aria-label="HabitAI"
+                            icon={<Image src="HabitAI Icon.svg" />}
+                            display="initial"
+                            boxSize="fit-content"
+                            colorScheme="transparent"
+                        />
+                    </Tooltip>
                 </Flex>
             </Flex>
         </>
