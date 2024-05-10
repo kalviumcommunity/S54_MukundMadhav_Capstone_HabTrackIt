@@ -7,6 +7,8 @@ import Signup from "./components/Signup";
 import Login from "./components/Login";
 import WriteUs from "./components/WriteUs";
 import Profile from "./components/Profile";
+import Dashboard from "./components/Dashboard";
+import Leaderboard from "./components/Leaderboard";
 
 const App = () => {
   const location = useLocation();
@@ -24,6 +26,8 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/write-us" element={<WriteUs />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
       </Routes>
       {shouldRenderFooter && <Footer />}
     </>
