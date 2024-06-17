@@ -7,9 +7,11 @@ const {
   updateUser,
   ifUserExists,
   updateUserProfilePicture,
-  findUserAndSendData
+  findUserAndSendData,
+  findAllUsersForLeaderboard,
 } = require("../controllers/userController");
 
+userRouter.get("/leads", findAllUsersForLeaderboard);
 
 userRouter.post("/signup", createUser);
 userRouter.post("/login", findUser);

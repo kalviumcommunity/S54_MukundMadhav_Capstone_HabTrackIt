@@ -29,7 +29,12 @@ const createUser = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRATION,
     });
 
-    const newUser = await userModel.create({ username, email, password, profilePicture });
+    const newUser = await userModel.create({
+      username,
+      email,
+      password,
+      profilePicture,
+    });
     // console.log(newUser);
     if (newUser) {
       return res
@@ -77,6 +82,21 @@ const findUser = throttle(
   10000,
   { trailing: false }
 );
+
+const findAllUsersForLeaderboard = async (req, res) => {
+  try {
+    const users = await userModel.find().sort({ userScore: -1 });
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error(
+      "Error occurred while fetching all users for leaderboard:",
+      error
+    );
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", message: error.message });
+  }
+};
 
 const ifUserExists = async (req, res) => {
   try {
@@ -135,6 +155,7 @@ const findUserAndSendData = async (req, res) => {
       username: user.username,
       email: user.email,
       profilePicture: user.profilePicture,
+      userScore: user.userScore,
     });
   } catch (error) {
     console.error("Error occurred while finding user:", error);
@@ -220,5 +241,6 @@ module.exports = {
   ifUserExists,
   updateUser,
   updateUserProfilePicture,
-  findUserAndSendData
+  findUserAndSendData,
+  findAllUsersForLeaderboard,
 };
