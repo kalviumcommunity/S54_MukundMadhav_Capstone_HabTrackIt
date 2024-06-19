@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
+  const [userScore, setUserScore] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -132,10 +133,11 @@ export const AuthProvider = ({ children }) => {
           },
         }
       );
-      const { email, username, profilePicture } = response.data;
+      const { email, username, profilePicture, userScore } = response.data;
       setEmail(email);
       setUsername(username);
       setProfilePicture(profilePicture);
+      setUserScore(userScore);
       setIsLoggedIn(true);
     } catch (error) {
       console.error(`Error fetching user data: ${error}`);
@@ -156,6 +158,7 @@ export const AuthProvider = ({ children }) => {
         email,
         username,
         profilePicture,
+        userScore,
         isLoggedIn,
         signInWithGoogle,
         signUpWithEmailAndPassword,
