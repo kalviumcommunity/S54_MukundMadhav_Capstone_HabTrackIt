@@ -68,7 +68,7 @@ const Leaderboard = () => {
                     {index + 1}
                   </Heading>
                   <Flex columnGap={4} w={"350px"} alignItems={"center"}>
-                    <Avatar />
+                    <Avatar src={lead.profilePicture}/>
                     <Heading fontSize={"lg"}>{lead.username}</Heading>
                   </Flex>
                   <Flex
