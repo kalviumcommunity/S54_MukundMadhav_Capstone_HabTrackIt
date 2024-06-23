@@ -12,11 +12,14 @@ export const AuthProvider = ({ children }) => {
   const [profilePicture, setProfilePicture] = useState("");
   const [userScore, setUserScore] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = Cookies.get("token");
     if (token) {
       fetchUserData(token);
+    } else {
+      setLoading(false); // Setting loading to false if no token found
     }
   }, []);
 
@@ -79,7 +82,7 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
-      // User exists
+       // User exists
       if (response.status === 200) {
         const { token } = response.data;
         Cookies.set("token", token);
@@ -141,6 +144,8 @@ export const AuthProvider = ({ children }) => {
       setIsLoggedIn(true);
     } catch (error) {
       console.error(`Error fetching user data: ${error}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -160,6 +165,7 @@ export const AuthProvider = ({ children }) => {
         profilePicture,
         userScore,
         isLoggedIn,
+        loading,
         signInWithGoogle,
         signUpWithEmailAndPassword,
         signInWithEmailAndPassword,
