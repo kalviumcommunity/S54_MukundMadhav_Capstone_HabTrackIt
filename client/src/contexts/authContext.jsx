@@ -12,11 +12,14 @@ export const AuthProvider = ({ children }) => {
   const [profilePicture, setProfilePicture] = useState("");
   const [userScore, setUserScore] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = Cookies.get("token");
     if (token) {
       fetchUserData(token);
+    } else {
+      setLoading(false); // Setting loading to false if no token found
     }
   }, []);
 
@@ -28,7 +31,6 @@ export const AuthProvider = ({ children }) => {
       let username = displayName.trim().toLowerCase().replace(/\s+/g, "");
       username += Math.floor(Math.random() * 1000);
       let res = await signUpOrSignIn(email, username, photoURL);
-      // console.log("res: ", res);
       return result;
     } catch (error) {
       return error;
@@ -79,7 +81,6 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
-      // User exists
       if (response.status === 200) {
         const { token } = response.data;
         Cookies.set("token", token);
@@ -87,7 +88,6 @@ export const AuthProvider = ({ children }) => {
         return response;
       }
 
-      // User does not exist
       if (response.status === 404) {
         const signupResponse = await axios.post(
           `${import.meta.env.VITE_API_URL}/signup`,
@@ -141,6 +141,8 @@ export const AuthProvider = ({ children }) => {
       setIsLoggedIn(true);
     } catch (error) {
       console.error(`Error fetching user data: ${error}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -160,6 +162,7 @@ export const AuthProvider = ({ children }) => {
         profilePicture,
         userScore,
         isLoggedIn,
+        loading,
         signInWithGoogle,
         signUpWithEmailAndPassword,
         signInWithEmailAndPassword,
