@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }) => {
       let username = displayName.trim().toLowerCase().replace(/\s+/g, "");
       username += Math.floor(Math.random() * 1000);
       let res = await signUpOrSignIn(email, username, photoURL);
+      // console.log("res: ", res);
       return result;
     } catch (error) {
       return error;
@@ -81,6 +82,7 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
+       // User exists
       if (response.status === 200) {
         const { token } = response.data;
         Cookies.set("token", token);
@@ -88,6 +90,7 @@ export const AuthProvider = ({ children }) => {
         return response;
       }
 
+      // User does not exist
       if (response.status === 404) {
         const signupResponse = await axios.post(
           `${import.meta.env.VITE_API_URL}/signup`,
