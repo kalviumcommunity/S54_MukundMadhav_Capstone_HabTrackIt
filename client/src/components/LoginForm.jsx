@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Flex,
   Stack,
@@ -27,7 +27,6 @@ import { TailSpin } from "react-loader-spinner";
 
 export default function LoginForm() {
   const { signInWithGoogle, signInWithEmailAndPassword } = useAuth();
-  const navigate = useNavigate();
   const toast = useToast();
   const usernameOrEmailId = useRef(null);
   const passwordId = useRef(null);
@@ -45,9 +44,6 @@ export default function LoginForm() {
           duration: 2000,
           isClosable: true,
         });
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
       } else if (result.code === "ERR_NETWORK") {
         toast({
           title: "Network Error.",
@@ -108,9 +104,6 @@ export default function LoginForm() {
           duration: 2000,
           isClosable: true,
         });
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
       } else if (result.code === "ERR_NETWORK") {
         toast({
           title: "Network Error.",
