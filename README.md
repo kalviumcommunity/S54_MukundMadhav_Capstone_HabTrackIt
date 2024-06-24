@@ -34,7 +34,7 @@
 
 ## Technologies Used :
 - **Front-end Framework :** `React.js`
-- **Back-end Frameworks :** `Node.js, Express.js, Websocket.io`
+- **Back-end Frameworks :** `Node.js, Express.js`
 - **Database :** `MongoDB` and many more to add...
 
 ## How To Setup Locally ?
