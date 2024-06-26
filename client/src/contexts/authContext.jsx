@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth } from "../firebase/firebase";
+import { auth, generateToken, messaging } from "../firebase/firebase";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { onMessage } from "firebase/messaging";
 
 const AuthContext = createContext();
 
@@ -15,6 +16,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // FCM
+    generateToken();
+    onMessage(messaging, (payload) => {
+      console.log(payload);
+    });
+    // FCM ends here
+
     const token = Cookies.get("token");
     if (token) {
       fetchUserData(token);
@@ -82,7 +90,7 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
-       // User exists
+      // User exists
       if (response.status === 200) {
         const { token } = response.data;
         Cookies.set("token", token);
