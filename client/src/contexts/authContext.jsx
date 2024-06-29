@@ -1,9 +1,14 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth, generateToken, messaging } from "../firebase/firebase";
+import {
+  auth,
+  requestNotificationPermission,
+  generateToken,
+  onMessageListener,
+} from "../firebase/firebase";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { onMessage } from "firebase/messaging";
+import { useToast } from "@chakra-ui/react";
 
 const AuthContext = createContext();
 
@@ -14,14 +19,9 @@ export const AuthProvider = ({ children }) => {
   const [userScore, setUserScore] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
+  const toast = useToast();
 
   useEffect(() => {
-    // FCM
-    onMessage(messaging, (payload) => {
-      console.log(payload);
-    });
-    // FCM ends here
-
     const token = Cookies.get("token");
     if (token) {
       fetchUserData(token);
@@ -35,6 +35,50 @@ export const AuthProvider = ({ children }) => {
       setupFCM();
     }
   }, [isLoggedIn]);
+
+  const setupFCM = async () => {
+    try {
+      const permissionGranted = await requestNotificationPermission();
+      if (permissionGranted) {
+        const token = await generateToken();
+        if (token) {
+          await sendTokenToBackend(token);
+        }
+      }
+
+      onMessageListener()
+        .then((payload) => {
+          console.log("Received foreground message:", payload);
+          toast({
+            position: "top",
+            title: payload.notification.title,
+            description: payload.notification.body,
+            variant: "left-accent",
+            isClosable: true,
+          });
+        })
+        .catch((err) => console.log("failed: ", err));
+    } catch (error) {
+      console.error("Error setting up FCM:", error);
+    }
+  };
+
+  const sendTokenToBackend = async (token) => {
+    try {
+      const response = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/save-fcm-token`,
+        { newToken: token },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        }
+      );
+      console.log("FCM token sent to backend:", response.data);
+    } catch (error) {
+      console.error("Error sending FCM token to backend:", error);
+    }
+  };
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
@@ -168,18 +212,6 @@ export const AuthProvider = ({ children }) => {
     setUsername("");
     setProfilePicture("");
     setIsLoggedIn(false);
-  };
-
-  const setupFCM = async () => {
-    try {
-      await generateToken();
-      onMessage(messaging, (payload) => {
-        console.log("Received foreground message:", payload);
-        // Handle the received message (e.g., show a notification)
-      });
-    } catch (error) {
-      console.error("Error setting up FCM:", error);
-    }
   };
 
   return (

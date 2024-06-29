@@ -131,21 +131,7 @@ const ifUserExists = async (req, res) => {
 
 const findUserAndSendData = async (req, res) => {
   try {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-    // If token is null, return Unauthorized error
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized: Missing token" });
-    }
-    // Verify the token
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      return res.status(401).json({ message: "Unauthorized: Invalid token" });
-    }
-    const email = decoded.email;
+    const email = req.user;
 
     const user = await userModel.findOne({ email });
     if (!user) {
@@ -199,21 +185,7 @@ const updateUser = async (req, res) => {
 
 const updateUserProfilePicture = async (req, res) => {
   try {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-    // If token is null, return Unauthorized error
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized: Missing token" });
-    }
-    // Verify the token
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      return res.status(401).json({ message: "Unauthorized: Invalid token" });
-    }
-    const email = decoded.email;
+    const email = req.user;
 
     const user = await userModel.findOne({ email });
     if (!user) {
@@ -235,20 +207,34 @@ const updateUserProfilePicture = async (req, res) => {
   }
 };
 
-// Update User FCM Tokens
-const updateUserTokens = async (userId, newToken) => {
+const updateUserTokens = async (req, res) => {
   try {
-    const user = await userModel.findById(userId);
+    const email = req.user;
+    const { newToken } = req.body;
 
-    // If the token doesn't exist in the array, add it
-    if (!user.fcmTokens.includes(newToken)) {
-      user.fcmTokens.push(newToken);
+    if (!newToken) {
+      return res.status(400).json({ message: "Bad Request: Missing newToken" });
     }
 
-    await user.save();
-    console.log("User tokens updated successfully.");
+    const result = await userModel.findOneAndUpdate(
+      { email: email },
+      {
+        $addToSet: { fcmTokens: newToken },
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!result) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // console.log("User tokens updated successfully.");
+    return res
+      .status(200)
+      .json({ message: "User tokens updated successfully" });
   } catch (error) {
     console.error("Error updating user tokens:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 

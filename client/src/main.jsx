@@ -9,10 +9,10 @@ import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <AuthProvider>
-      <ChakraProvider theme={theme}>
+    <ChakraProvider theme={theme}>
+      <AuthProvider>
         <App />
-      </ChakraProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </ChakraProvider>
   </BrowserRouter>
 );

@@ -24,7 +24,33 @@ messaging.onBackgroundMessage((payload) => {
   const notificationOptions = {
     body: payload.notification.body,
     icon: payload.notification.image,
+    data: {
+      url: "https://habtrackit.vercel.app/",
+    },
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients
+      .matchAll({
+        type: "window",
+      })
+      .then((windowClients) => {
+        // If a window is already open, focus on it.
+        for (let i = 0; i < windowClients.length; i++) {
+          const client = windowClients[i];
+          if (client.url === event.notification.data.url && "focus" in client) {
+            return client.focus();
+          }
+        }
+        // If no window is open, open a new one.
+        if (clients.openWindow) {
+          return clients.openWindow(event.notification.data.url);
+        }
+      })
+  );
 });
