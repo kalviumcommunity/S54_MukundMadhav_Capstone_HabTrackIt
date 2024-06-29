@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  fcmTokens: {
+    type: [String],
+  },
   userScore: {
     type: Number,
     default: 0,

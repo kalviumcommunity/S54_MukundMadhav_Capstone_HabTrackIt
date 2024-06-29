@@ -1,19 +1,22 @@
 const express = require("express");
-const { Server } = require("socket.io");
-const { createServer } = require("http");
 const cors = require("cors");
 const connectedToDB = require("./config/db");
 const habitRouter = require("./routes/habitRoutes");
 const userRouter = require("./routes/userRoutes");
+const admin = require("firebase-admin");
+const { serviceAccount } = require("./config/serviceAccountKey.js");
+const cron = require("node-cron");
+const { sendBroadcastNotification } = require("./cron/cronJob");
+
+// Initialize Firebase Admin SDK
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
-const server = createServer(app);
-
-
-const io = new Server(server);
 
 // Defined the Home Route
 app.get("/", (req, res) => {
@@ -30,6 +33,7 @@ app.get("/", (req, res) => {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Something went wrong!");
+  next();
 });
 
 // For Using all the routes
@@ -42,7 +46,6 @@ const startServer = async () => {
     db = await connectedToDB();
     process.on("SIGINT", async () => {
       console.log("Received SIGINT. Shutting down gracefully...");
-      io.close();
       await db.close();
       process.exit(0);
     });
@@ -54,7 +57,12 @@ const startServer = async () => {
 
 startServer();
 
+// For sending daily reminder notifications to all users
+cron.schedule("0 18 * * *", async () => {
+  await sendBroadcastNotification();
+});
+
 // Listening to the server at the PORT
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on PORT : ${PORT}`);
 });

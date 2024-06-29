@@ -235,6 +235,23 @@ const updateUserProfilePicture = async (req, res) => {
   }
 };
 
+// Update User FCM Tokens
+const updateUserTokens = async (userId, newToken) => {
+  try {
+    const user = await userModel.findById(userId);
+
+    // If the token doesn't exist in the array, add it
+    if (!user.fcmTokens.includes(newToken)) {
+      user.fcmTokens.push(newToken);
+    }
+
+    await user.save();
+    console.log("User tokens updated successfully.");
+  } catch (error) {
+    console.error("Error updating user tokens:", error);
+  }
+};
+
 module.exports = {
   createUser,
   findUser,
@@ -243,4 +260,5 @@ module.exports = {
   updateUserProfilePicture,
   findUserAndSendData,
   findAllUsersForLeaderboard,
+  updateUserTokens,
 };

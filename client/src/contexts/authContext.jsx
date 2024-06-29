@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // FCM
-    generateToken();
     onMessage(messaging, (payload) => {
       console.log(payload);
     });
@@ -30,6 +29,12 @@ export const AuthProvider = ({ children }) => {
       setLoading(false); // Setting loading to false if no token found
     }
   }, []);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setupFCM();
+    }
+  }, [isLoggedIn]);
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
@@ -163,6 +168,18 @@ export const AuthProvider = ({ children }) => {
     setUsername("");
     setProfilePicture("");
     setIsLoggedIn(false);
+  };
+
+  const setupFCM = async () => {
+    try {
+      await generateToken();
+      onMessage(messaging, (payload) => {
+        console.log("Received foreground message:", payload);
+        // Handle the received message (e.g., show a notification)
+      });
+    } catch (error) {
+      console.error("Error setting up FCM:", error);
+    }
   };
 
   return (
