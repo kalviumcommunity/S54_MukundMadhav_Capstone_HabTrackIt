@@ -100,21 +100,31 @@ const Dashboard = () => {
         bgGradient="linear(to-br,#1B1745,#233249)"
         flexDir={"column"}
         minH="calc(100vh - 5em)"
+        className="background"
       >
-        <VStack textColor={"white"} justifyContent={"center"} pt={6} mx={40}>
-          <VStack
-            bgColor="#063882"
-            px={10}
-            py={2}
-            borderRadius={10}
-            alignSelf={"flex-start"}
-          >
-            <Heading size={"md"}>Your Score</Heading>
-            <Flex columnGap={2}>
-              <Heading size={"md"}>{userScore}</Heading>
-              <Image src="Score Icon.svg" h={"1.6rem"} />
+        <Flex textColor={"white"} className="main-container" flexDir={"column"} pt={6} mx={40} rowGap={2}>
+          <Flex className="top-section" w={"100%"} justifyContent={"space-between"} alignItems={"center"}>
+            <Flex
+              bgColor="#063882"
+              px={10}
+              borderRadius={10}
+              className="score-container"
+              flexDir={"column"}
+              justifyContent={"center"}
+              alignItems={"center"}
+              rowGap={2}
+              h={"4.6em"}
+            >
+              <Heading size={"md"}>Your Score</Heading>
+              <Flex columnGap={2}>
+                <Heading size={"md"}>{userScore}</Heading>
+                <Image src="Score Icon.svg" h={"1.6rem"} />
+              </Flex>
             </Flex>
-          </VStack>
+            <Flex>
+              <Button colorScheme="cyan">Edit Your Habits</Button>
+            </Flex>
+          </Flex>
           <Flex w={"100%"} justifyContent={"space-between"} mt={8}>
             <VStack
               bgGradient="linear(to-br,#326BA0,#063882)"
@@ -189,7 +199,7 @@ const Dashboard = () => {
               </Flex>
             </VStack>
           </Flex>
-        </VStack>
+        </Flex>
         <Flex alignSelf={"flex-end"} justifyContent={"center"} pr={4}>
           <Tooltip label="Leaderboard" placement="bottom">
             <Link to="/leaderboard">
