@@ -14,15 +14,19 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   Button,
+  Center
 } from "@chakra-ui/react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/authContext";
+import Cookies from "js-cookie"
 
 const Dashboard = () => {
   const [goodHabits, setGoodHabits] = useState([]);
   const [badHabits, setBadHabits] = useState([]);
   const [selectedHabit, setSelectedHabit] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(true)
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const { userScore } = useAuth();
   const cancelRef = useRef();
@@ -31,20 +35,34 @@ const Dashboard = () => {
     const fetchHabits = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/habits`
-        );
+          `${import.meta.env.VITE_API_URL}/habits`, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`
+          }
+        });
+
         const habits = response.data;
-        const good = habits.filter((habit) => habit.type === "good");
-        const bad = habits.filter((habit) => habit.type === "bad");
-        setGoodHabits(good);
-        setBadHabits(bad);
+        if (habits.length === 0) {
+          setErrorMessage("No habits found. Please add some habits to display.");
+        } else {
+          setGoodHabits(habits.filter((habit) => habit.type === "good"));
+          setBadHabits(habits.filter((habit) => habit.type === "bad"));
+        }
       } catch (error) {
-        console.log(error.message);
+        if (error.response && error.response.status === 404) {
+          setErrorMessage("No habits found. Please add some habits to display.");
+        } else {
+          console.log("Error fetching habits:", error.message);
+          setErrorMessage("Error fetching habits. Please try again later.");
+        }
+      } finally {
+        setLoading(false)
       }
     };
 
     fetchHabits();
   }, []);
+
 
   const handleHabitClick = (habit) => {
     setSelectedHabit(habit);
@@ -94,6 +112,13 @@ const Dashboard = () => {
     handleAlertClose();
   };
 
+  if (loading) {
+    return (
+      <Center minH="calc(100vh - 5em)">
+      </Center>
+    );
+  }
+
   return (
     <>
       <Flex
@@ -125,80 +150,86 @@ const Dashboard = () => {
               <Button colorScheme="cyan">Edit Your Habits</Button>
             </Flex>
           </Flex>
-          <Flex w={"100%"} justifyContent={"space-between"} mt={8}>
-            <VStack
-              bgGradient="linear(to-br,#326BA0,#063882)"
-              minW={"400px"}
-              borderRadius={20}
-              px={4}
-              pb={10}
-              pt={8}
-            >
-              <Heading size={"md"} pb={4}>
-                Good Habits / Habits to do Daily
-              </Heading>
-              <Flex
-                bgColor={"rgba(255, 255, 255, 0.35)"}
-                p={6}
-                borderRadius={6}
-                w={"80%"}
-                flexDir={"column"}
-                rowGap={3}
-                minH={"250px"}
+          {errorMessage ? (
+            <Center minH="60vh">
+              <Heading size="lg">{errorMessage}</Heading>
+            </Center>
+          ) : (
+            <Flex w="100%" justifyContent="space-between" mt={8}>
+              <VStack
+                bgGradient="linear(to-br,#326BA0,#063882)"
+                minW="400px"
+                borderRadius={20}
+                px={4}
+                pb={10}
+                pt={8}
               >
-                {goodHabits.map((habit) => (
-                  <Flex
-                    key={habit._id}
-                    borderBottom={"1px solid white"}
-                    justifyContent={"space-between"}
-                    cursor={"pointer"}
-                    onClick={() => handleHabitClick(habit)}
-                  >
-                    <Text fontSize={"lg"}>{habit.title}</Text>
-                    <Text textColor={"green"} fontSize={"lg"}>
-                      +1
-                    </Text>
-                  </Flex>
-                ))}
-              </Flex>
-            </VStack>
-            <VStack
-              bgGradient="linear(to-br,#326BA0,#063882)"
-              minW={"400px"}
-              borderRadius={20}
-              px={4}
-              pb={10}
-              pt={8}
-            >
-              <Heading size={"md"} pb={4}>
-                Bad Habits / Habits to Break
-              </Heading>
-              <Flex
-                bgColor={"rgba(255, 255, 255, 0.35)"}
-                p={6}
-                borderRadius={6}
-                w={"80%"}
-                flexDir={"column"}
-                rowGap={3}
-                minH={"250px"}
+                <Heading size="md" pb={4}>
+                  Good Habits / Habits to do Daily
+                </Heading>
+                <Flex
+                  bgColor="rgba(255, 255, 255, 0.35)"
+                  p={6}
+                  borderRadius={6}
+                  w="80%"
+                  flexDir="column"
+                  rowGap={3}
+                  minH="250px"
+                >
+                  {goodHabits.map((habit) => (
+                    <Flex
+                      key={habit._id}
+                      borderBottom="1px solid white"
+                      justifyContent="space-between"
+                      cursor="pointer"
+                      onClick={() => handleHabitClick(habit)}
+                    >
+                      <Text fontSize="lg">{habit.title}</Text>
+                      <Text textColor="green" fontSize="lg">
+                        +1
+                      </Text>
+                    </Flex>
+                  ))}
+                </Flex>
+              </VStack>
+              <VStack
+                bgGradient="linear(to-br,#326BA0,#063882)"
+                minW="400px"
+                borderRadius={20}
+                px={4}
+                pb={10}
+                pt={8}
               >
-                {badHabits.map((habit) => (
-                  <Flex
-                    key={habit._id}
-                    borderBottom={"1px solid white"}
-                    justifyContent={"space-between"}
-                    cursor={"pointer"}
-                    onClick={() => handleHabitClick(habit)}
-                  >
-                    <Text fontSize={"lg"}>{habit.title}</Text>
-                    <Text textColor={"red"} fontSize={"lg"}>
-                      -1
-                    </Text>
-                  </Flex>
-                ))}
-              </Flex>
-            </VStack>
-          </Flex>
+                <Heading size="md" pb={4}>
+                  Bad Habits / Habits to Break
+                </Heading>
+                <Flex
+                  bgColor="rgba(255, 255, 255, 0.35)"
+                  p={6}
+                  borderRadius={6}
+                  w="80%"
+                  flexDir="column"
+                  rowGap={3}
+                  minH="250px"
+                >
+                  {badHabits.map((habit) => (
+                    <Flex
+                      key={habit._id}
+                      borderBottom="1px solid white"
+                      justifyContent="space-between"
+                      cursor="pointer"
+                      onClick={() => handleHabitClick(habit)}
+                    >
+                      <Text fontSize="lg">{habit.title}</Text>
+                      <Text textColor="red" fontSize="lg">
+                        -1
+                      </Text>
+                    </Flex>
+                  ))}
+                </Flex>
+              </VStack>
+            </Flex>
+          )}
         </Flex>
         <Flex alignSelf={"flex-end"} justifyContent={"center"} pr={4}>
           <Tooltip label="Leaderboard" placement="bottom">
