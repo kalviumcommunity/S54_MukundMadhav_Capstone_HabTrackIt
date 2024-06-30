@@ -5,11 +5,11 @@ const UserModel = require("../models/userModel");
 const getAllHabits = async (req, res) => {
   try {
     const email = req.user
-    console.log(email)
+    // console.log(email)
     const user = await UserModel.findOne({ email: email })
-    console.log(user._id)
+    // console.log(user._id)
     const habits = await habitModel.find({ user: user._id });
-    console.log(habits)
+    // console.log(habits)
     if (habits.length > 0) {
       return res.status(200).json(habits);
     } else {
@@ -27,9 +27,15 @@ const getAllHabits = async (req, res) => {
 
 const postHabit = async (req, res) => {
   try {
-    const { title, user } = req.body;
+    const email = req.user;
+    const { title } = req.body;
     if (!title || title.trim().length === 0) {
       return res.status(400).json({ error: "Habit title is required." });
+    }
+
+    const user = await UserModel.findOne({ email: email })
+    if (!user) {
+      return res.status(400).json({ error: "User not found." });
     }
 
     const existingHabit = await habitModel.findOne({ title, user });
@@ -39,7 +45,7 @@ const postHabit = async (req, res) => {
       });
     }
 
-    const newHabit = await habitModel.create(req.body);
+    const newHabit = await habitModel.create({ ...req.body, user: user._id });
     if (newHabit) {
       return res.status(201).json(newHabit);
     } else {
@@ -56,9 +62,11 @@ const postHabit = async (req, res) => {
 const updateHabit = async (req, res) => {
   try {
     const { habitId } = req.params;
+    // console.log(habitId)
     const updateData = req.body;
+    // console.log(updateData)
     // Validation of fields to be updated
-    const allowedFields = ["title", "type", "status"];
+    const allowedFields = ["title", "status"];
     const isValidOperation = Object.keys(updateData).every((field) =>
       allowedFields.includes(field)
     );
@@ -87,4 +95,26 @@ const updateHabit = async (req, res) => {
   }
 };
 
-module.exports = { getAllHabits, postHabit, updateHabit };
+
+const deleteHabit = async (req, res) => {
+  try {
+    const { deleteId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(deleteId)) {
+      return res.status(400).json({ error: "Invalid habit ID." });
+    }
+
+    const deletedHabit = await habitModel.findByIdAndDelete(deleteId);
+    if (!deletedHabit) {
+      return res.status(404).json({ error: "Habit not found." });
+    }
+    return res.status(200).json({ message: "Habit deleted successfully." });
+  } catch (error) {
+    console.error("Error occurred while deleting habit:", error);
+    return res
+      .status(500)
+      .json({ error: "Internal Server Error", message: error.message });
+  }
+};
+
+module.exports = { getAllHabits, postHabit, updateHabit, deleteHabit };

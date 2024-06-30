@@ -147,7 +147,7 @@ const Dashboard = () => {
               </Flex>
             </Flex>
             <Flex>
-              <Button colorScheme="cyan">Edit Your Habits</Button>
+              <Link to={"/edit-habits"}><Button colorScheme="cyan">Edit Your Habits</Button></Link>
             </Flex>
           </Flex>
           {errorMessage ? (
