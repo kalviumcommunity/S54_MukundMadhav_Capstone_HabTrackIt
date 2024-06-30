@@ -12,7 +12,7 @@ const AuthWrapper = ({ children }) => {
   }
 
   // Define protected routes
-  const protectedRoutes = ["/dashboard", "/profile", "/leaderboard"];
+  const protectedRoutes = ["/dashboard", "/profile", "/leaderboard", "/edit-habits"];
   // Define routes that logged-in users shouldn't access
   const publicRoutes = ["/login", "/signup", "/"];
 

@@ -11,6 +11,7 @@ import Dashboard from "./components/Dashboard";
 import Leaderboard from "./components/Leaderboard";
 import AuthWrapper from "./utils/authWrapper";
 import { useAuth } from "./contexts/authContext";
+import EditHabits from "./components/EditHabits";
 
 const App = () => {
   const location = useLocation();
@@ -38,6 +39,7 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/edit-habits" element={<EditHabits />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthWrapper>
