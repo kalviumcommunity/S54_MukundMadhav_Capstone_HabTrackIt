@@ -60,6 +60,10 @@ startServer();
 // For sending daily reminder notifications to all users
 cron.schedule("0 18 * * *", async () => {
   await sendBroadcastNotification();
+},{
+  scheduled: true,
+  timezone: "Asia/Kolkata"
+
 });
 
 // Listening to the server at the PORT
