@@ -3,15 +3,14 @@ const habitRouter = express.Router();
 
 const {
   getAllHabits,
-  getHabitsByUser,
   postHabit,
   updateHabit,
 } = require("../controllers/habitController");
 
+const authenticateToken = require("../middlewares/authenticateToken")
 const habitValidator = require("../middlewares/habitValidator");
 
-habitRouter.get("/habits", getAllHabits);
-habitRouter.get("/habits/user/:userId", getHabitsByUser);
+habitRouter.get("/habits", authenticateToken, getAllHabits);
 
 habitRouter.post("/habits", habitValidator, postHabit);
 

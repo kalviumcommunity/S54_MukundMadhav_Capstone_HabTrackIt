@@ -1,9 +1,15 @@
 const { mongoose } = require("mongoose");
 const habitModel = require("../models/habitModel");
+const UserModel = require("../models/userModel");
 
 const getAllHabits = async (req, res) => {
   try {
-    const habits = await habitModel.find({});
+    const email = req.user
+    console.log(email)
+    const user = await UserModel.findOne({ email: email })
+    console.log(user._id)
+    const habits = await habitModel.find({ user: user._id });
+    console.log(habits)
     if (habits.length > 0) {
       return res.status(200).json(habits);
     } else {
@@ -14,25 +20,6 @@ const getAllHabits = async (req, res) => {
   } catch (error) {
     console.error("Error occurred while fetching all habits:", error);
     res
-      .status(500)
-      .json({ error: "Internal Server Error", message: error.message });
-  }
-};
-
-const getHabitsByUser = async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const habits = await habitModel.find({ user: userId });
-    if (habits.length > 0) {
-      return res.status(200).json(habits);
-    } else {
-      return res
-        .status(404)
-        .json({ message: "No habits found for this user." });
-    }
-  } catch (error) {
-    console.error("Error occurred while fetching habits by user:", error);
-    return res
       .status(500)
       .json({ error: "Internal Server Error", message: error.message });
   }
@@ -100,4 +87,4 @@ const updateHabit = async (req, res) => {
   }
 };
 
-module.exports = { getAllHabits, getHabitsByUser, postHabit, updateHabit };
+module.exports = { getAllHabits, postHabit, updateHabit };
