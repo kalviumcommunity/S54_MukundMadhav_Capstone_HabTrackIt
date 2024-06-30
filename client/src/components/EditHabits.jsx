@@ -159,7 +159,7 @@ const EditHabits = () => {
                                 <FormControl mt={4}>
                                     <FormLabel>Habit Type</FormLabel>
                                     <Input
-                                        placeholder="Habit Type"
+                                        placeholder="Enter either good or bad"
                                         value={newHabitType}
                                         onChange={(e) => setNewHabitType(e.target.value)}
                                     />
