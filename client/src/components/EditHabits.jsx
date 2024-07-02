@@ -75,6 +75,15 @@ const EditHabits = () => {
 
     const updateHabit = async () => {
         try {
+            if (!selectedHabit.title.trim()) {
+                alert("Habit Title cannot be empty.")
+                return
+            }
+            const originalHabit = habits.find(habit => habit._id === selectedHabit._id);
+            if (originalHabit.title === selectedHabit.title.trim()) {
+                alert("New Habit Title cannot be the same as the current title.");
+                return;
+            }
             const response = await axios.put(
                 `${import.meta.env.VITE_API_URL}/habits/update/${selectedHabit._id}`,
                 {

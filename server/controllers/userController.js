@@ -238,6 +238,36 @@ const updateUserTokens = async (req, res) => {
   }
 };
 
+const updateUserScore = async (req, res) => {
+  try {
+    const email = req.user;
+    const { userScore } = req.body;
+    // console.log(userScore);
+
+    if (typeof userScore !== "number" || isNaN(userScore)) {
+      return res.status(400).json({ message: "Invalid score value" });
+    }
+
+    const user = await userModel.findOneAndUpdate(
+      { email },
+      { userScore: userScore },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "User score updated successfully",
+      userScore: user.userScore,
+    });
+  } catch (error) {
+    console.error("Error updating user score:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createUser,
   findUser,
@@ -247,4 +277,5 @@ module.exports = {
   findUserAndSendData,
   findAllUsersForLeaderboard,
   updateUserTokens,
+  updateUserScore,
 };

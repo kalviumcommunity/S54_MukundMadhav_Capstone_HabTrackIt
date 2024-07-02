@@ -10,6 +10,7 @@ const {
   findUserAndSendData,
   findAllUsersForLeaderboard,
   updateUserTokens,
+  updateUserScore,
 } = require("../controllers/userController");
 const authenticateToken = require("../middlewares/authenticateToken");
 
@@ -26,6 +27,7 @@ userRouter.put(
   authenticateToken,
   updateUserProfilePicture
 );
+userRouter.put("/update-score", authenticateToken, updateUserScore);
 
 userRouter.patch("/save-fcm-token", authenticateToken, updateUserTokens);
 

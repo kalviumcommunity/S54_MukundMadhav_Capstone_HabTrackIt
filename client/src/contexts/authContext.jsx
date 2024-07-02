@@ -221,6 +221,7 @@ export const AuthProvider = ({ children }) => {
         username,
         profilePicture,
         userScore,
+        setUserScore,
         isLoggedIn,
         loading,
         signInWithGoogle,

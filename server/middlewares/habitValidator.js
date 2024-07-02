@@ -1,7 +1,7 @@
 const joi = require("joi");
 
 const habitValidationSchema = joi.object({
-  title: joi.string().min(3).required(),
+  title: joi.string().min(3),
   type: joi.string().valid("good", "bad"),
   user: joi.string().pattern(/^[0-9a-fA-F]{24}$/),   //Regex Pattern for mongoose Id
   score: joi.number().default(0),
