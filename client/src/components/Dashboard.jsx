@@ -16,6 +16,7 @@ import {
   Button,
   Center,
 } from "@chakra-ui/react";
+import { CloseIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/authContext";
@@ -294,12 +295,24 @@ const Dashboard = () => {
         <AlertDialog
           isOpen={isAlertOpen}
           leastDestructiveRef={cancelRef}
+          isCentered={true}
           onClose={handleAlertClose}
         >
           <AlertDialogOverlay>
             <AlertDialogContent>
-              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              <AlertDialogHeader
+                fontSize="lg"
+                fontWeight="bold"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 {selectedHabit.title}
+                <IconButton
+                  icon={<CloseIcon />}
+                  size="sm"
+                  onClick={handleAlertClose}
+                />
               </AlertDialogHeader>
 
               <AlertDialogBody>
