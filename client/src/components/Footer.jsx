@@ -8,7 +8,6 @@ const Footer = () => {
     "Express JS",
     "Node JS",
     "MongoDB",
-    "Websocket IO",
   ];
 
   const features = [

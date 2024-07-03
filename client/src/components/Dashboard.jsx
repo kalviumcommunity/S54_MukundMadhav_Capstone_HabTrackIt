@@ -119,15 +119,16 @@ const Dashboard = () => {
 
   const handleAlertConfirm = async (response) => {
     if (selectedHabit) {
-      const newScore =
-        selectedHabit.type === "good"
-          ? userScore + (response === "Yes" ? 1 : 0)
-          : userScore - (response === "Yes" ? 1 : 0);
+      let scoreChange = 0;
+      if (selectedHabit.type === "good") {
+        scoreChange = response === "Yes" ? 1 : -1;
+      } else if (selectedHabit.type === "bad") {
+        scoreChange = response === "Yes" ? -1 : 1;
+      }
+
+      const newScore = userScore + scoreChange;
       await updateUserScore(newScore);
-      await updateHabitStatus(
-        selectedHabit._id,
-        response === "Yes" ? true : false
-      );
+      await updateHabitStatus(selectedHabit._id, true);
       handleAlertClose();
     }
   };
@@ -277,7 +278,7 @@ const Dashboard = () => {
             </Link>
           </Tooltip>
 
-          <Tooltip label="HabitAI" placement="bottom">
+          {/* <Tooltip label="HabitAI" placement="bottom">
             <IconButton
               aria-label="HabitAI"
               icon={<Image src="HabitAI Icon.svg" />}
@@ -285,7 +286,7 @@ const Dashboard = () => {
               boxSize="fit-content"
               colorScheme="transparent"
             />
-          </Tooltip>
+          </Tooltip> */}
         </Flex>
       </Flex>
 
@@ -303,12 +304,15 @@ const Dashboard = () => {
 
               <AlertDialogBody>
                 {selectedHabit.type === "good"
-                  ? "Did you complete this good habit?"
-                  : "Did you do this bad habit?"}
+                  ? "Did you complete this good habit today?"
+                  : "Did you do this bad habit today?"}
               </AlertDialogBody>
 
               <AlertDialogFooter>
-                <Button ref={cancelRef} onClick={handleAlertClose}>
+                <Button
+                  ref={cancelRef}
+                  onClick={() => handleAlertConfirm("No")}
+                >
                   No
                 </Button>
                 <Button
