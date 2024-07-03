@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const UserModel = require("./userModel");
+const moment = require("moment-timezone");
 
 const habitSchema = new mongoose.Schema(
   {
@@ -17,35 +18,48 @@ const habitSchema = new mongoose.Schema(
       ref: UserModel,
       required: true,
     },
-    score: {
-      type: Number,
-      default: 0,
-    },
     status: {
       type: Boolean,
       default: false,
+    },
+    lastResetDate: {
+      type: Date,
+      default: () => moment().tz("Asia/Kolkata").startOf("day").toDate(),
     },
   },
   { timestamps: true }
 );
 
-habitSchema.pre("save", function (next) {
-  const now = new Date();
-  // Check if it's a new document or if the lastUpdatedDate needs to be updated
-  if (this.isNew || this.modifiedPaths().includes("status")) {
-    this.status = false;
-    this.lastUpdatedDate = now;
-  } else if (
-    !this.isNew &&
-    this.lastUpdatedDate &&
-    now.getDate() !== this.lastUpdatedDate.getDate()
-  ) {
-    // Reset status to false if it's a new day
-    this.status = false;
-    this.lastUpdatedDate = now;
-  }
-  next();
-});
+habitSchema.statics.resetDailyStatus = async function () {
+  const today = moment().tz("Asia/Kolkata").startOf("day");
+  const result = await this.updateMany(
+    {
+      lastResetDate: { $lt: today.toDate() },
+    },
+    {
+      $set: {
+        status: false,
+        lastResetDate: today.toDate(),
+      },
+    }
+  );
+  console.log(`Reset status for ${result.modifiedCount} habits`);
+};
+
+habitSchema.statics.markCompleted = async function (habitId) {
+  const today = moment().tz("Asia/Kolkata").startOf("day");
+  const result = await this.findByIdAndUpdate(
+    habitId,
+    {
+      $set: {
+        status: true,
+        lastResetDate: today.toDate(),
+      },
+    },
+    { new: true }
+  );
+  return result;
+};
 
 const habitModel = mongoose.model("habits", habitSchema);
 

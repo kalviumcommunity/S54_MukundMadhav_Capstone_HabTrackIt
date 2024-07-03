@@ -7,6 +7,7 @@ const admin = require("firebase-admin");
 const { serviceAccount } = require("./config/serviceAccountKey.js");
 const cron = require("node-cron");
 const { sendBroadcastNotification } = require("./cron/cronJob");
+const habitModel = require("./models/habitModel.js");
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
@@ -58,12 +59,21 @@ const startServer = async () => {
 startServer();
 
 // For sending daily reminder notifications to all users
-cron.schedule("0 18 * * *", async () => {
-  await sendBroadcastNotification();
-},{
-  scheduled: true,
-  timezone: "Asia/Kolkata"
+cron.schedule(
+  "0 18 * * *",
+  async () => {
+    await sendBroadcastNotification();
+  },
+  {
+    scheduled: true,
+    timezone: "Asia/Kolkata",
+  }
+);
 
+// Cron Job for Resetting the Daily Status of Habits
+cron.schedule("0 0 * * *", async () => {
+  console.log("Running daily habit reset");
+  await habitModel.resetDailyStatus();
 });
 
 // Listening to the server at the PORT

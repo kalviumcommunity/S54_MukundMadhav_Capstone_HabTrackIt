@@ -4,9 +4,9 @@ const UserModel = require("../models/userModel");
 
 const getAllHabits = async (req, res) => {
   try {
-    const email = req.user
+    const email = req.user;
     // console.log(email)
-    const user = await UserModel.findOne({ email: email })
+    const user = await UserModel.findOne({ email: email });
     // console.log(user._id)
     const habits = await habitModel.find({ user: user._id });
     // console.log(habits)
@@ -33,7 +33,7 @@ const postHabit = async (req, res) => {
       return res.status(400).json({ error: "Habit title is required." });
     }
 
-    const user = await UserModel.findOne({ email: email })
+    const user = await UserModel.findOne({ email: email });
     if (!user) {
       return res.status(400).json({ error: "User not found." });
     }
@@ -78,11 +78,21 @@ const updateHabit = async (req, res) => {
       return res.status(400).json({ error: "Invalid habit ID." });
     }
 
-    const updatedHabit = await habitModel.findByIdAndUpdate(
-      habitId,
-      updateData,
-      { new: true }
-    );
+    let updatedHabit;
+
+    if (updateData.status === true) {
+      // If status is being set to true, use markAsCompleted
+      updatedHabit = await habitModel.markCompleted(habitId);
+      // Remove status from updateData as it's already been handled
+      delete updateData.status;
+    }
+
+    // If there are other fields to update or if status was set to false
+    if (Object.keys(updateData).length > 0) {
+      updatedHabit = await habitModel.findByIdAndUpdate(habitId, updateData, {
+        new: true,
+      });
+    }
     if (!updatedHabit) {
       return res.status(404).json({ error: "Habit not found." });
     }
@@ -94,7 +104,6 @@ const updateHabit = async (req, res) => {
       .json({ error: "Internal Server Error", message: error.message });
   }
 };
-
 
 const deleteHabit = async (req, res) => {
   try {
