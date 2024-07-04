@@ -1,4 +1,5 @@
 const express = require("express");
+const rateLimiter = require("../middlewares/rateLimiter");
 const userRouter = express.Router();
 
 const {
@@ -17,7 +18,7 @@ const authenticateToken = require("../middlewares/authenticateToken");
 userRouter.get("/leads", findAllUsersForLeaderboard);
 
 userRouter.post("/signup", createUser);
-userRouter.post("/login", findUser);
+userRouter.post("/login", rateLimiter, findUser);
 userRouter.post("/existing-user", authenticateToken, findUserAndSendData);
 userRouter.post("/identify-user", ifUserExists);
 

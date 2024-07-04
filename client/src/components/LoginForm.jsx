@@ -95,7 +95,7 @@ export default function LoginForm() {
         usernameOrEmail,
         password
       );
-      // console.log(result)
+      // console.log(result);
       if (result.status === 200) {
         toast({
           title: "Sign In Successful.",
@@ -112,11 +112,19 @@ export default function LoginForm() {
           duration: 2000,
           isClosable: true,
         });
-      } else {
+      } else if (result.response.status == 401) {
         toast({
           title: "Sign In Failed.",
-          description: result.response.data.message,
+          description: "Invalid Username or Password.",
           status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else if (result.response.status == 429) {
+        toast({
+          title: "Sign In Failed.",
+          description: "Too many requests. Please try again later.",
+          status: "warning",
           duration: 2000,
           isClosable: true,
         });

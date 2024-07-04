@@ -12,13 +12,19 @@ const PORT = process.env.PORT || 3000;
 
 const app = express();
 const corsConfig = {
-  origin: "*",
+  origin: ["http://localhost:5173","http://localhost:5174", "https://habtrackit.vercel.app"],
   credentials: true,
-  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
-  preflightContinue: false,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: [
+    "Origin",
+    "X-Requested-With",
+    "Content-Type",
+    "Accept",
+    "Authorization",
+  ],
   optionsSuccessStatus: 204,
 };
-app.options("", cors(corsConfig));
+app.options("*", cors(corsConfig));
 app.use(cors(corsConfig));
 app.use(express.json());
 
