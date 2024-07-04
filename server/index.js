@@ -1,23 +1,35 @@
 const express = require("express");
 const cors = require("cors");
-const connectedToDB = require("./config/db");
-const habitRouter = require("./routes/habitRoutes");
-const userRouter = require("./routes/userRoutes");
+const connectedToDB = require("./config/db.js");
+const habitRouter = require("./routes/habitRoutes.js");
+const userRouter = require("./routes/userRoutes.js");
 const admin = require("firebase-admin");
 const { serviceAccount } = require("./config/serviceAccountKey.js");
 const cron = require("node-cron");
-const { sendBroadcastNotification } = require("./cron/cronJob");
+const { sendBroadcastNotification } = require("./cron/cronJob.js");
 const habitModel = require("./models/habitModel.js");
+const PORT = process.env.PORT || 3000;
+
+const app = express();
+const corsConfig = {
+  origin: "*",
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+app.options("", cors(corsConfig));
+app.use(cors(corsConfig));
+app.use(express.json());
+
+// For Using all the routes
+app.use("/", habitRouter);
+app.use("/", userRouter);
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-const PORT = process.env.PORT || 3000;
 
 // Defined the Home Route
 app.get("/", (req, res) => {
@@ -36,10 +48,6 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something went wrong!");
   next();
 });
-
-// For Using all the routes
-app.use("/", habitRouter);
-app.use("/", userRouter);
 
 // For connecting and disconnecting from the server
 const startServer = async () => {

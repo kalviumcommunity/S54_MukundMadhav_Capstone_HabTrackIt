@@ -2,14 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "server.js",
+      "src": "index.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/"
+      "dest": "/",
+      "methods": ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"]
     }
   ]
 }
