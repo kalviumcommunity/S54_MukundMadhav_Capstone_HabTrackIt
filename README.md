@@ -74,4 +74,4 @@ We value your input and are committed to helping you on your journey towards bui
 ## Links :
 > Here are the links of Frontend & Backend Deployment :
 > - [Frontend | HabTrackIt](https://habtrackit.vercel.app)
-> - [Backend | HabTrackIt](https://habtrackit-server.vercel.app)
+> - [Backend | HabTrackIt](https://habtrackit.onrender.com)
