@@ -12,7 +12,11 @@ const PORT = process.env.PORT || 3000;
 
 const app = express();
 const corsConfig = {
-  origin: ["http://localhost:5173","http://localhost:5174", "https://habtrackit.vercel.app"],
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://habtrackit.vercel.app",
+  ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
   allowedHeaders: [
@@ -85,10 +89,17 @@ cron.schedule(
 );
 
 // Cron Job for Resetting the Daily Status of Habits
-cron.schedule("0 0 * * *", async () => {
-  console.log("Running daily habit reset");
-  await habitModel.resetDailyStatus();
-});
+cron.schedule(
+  "0 0 * * *",
+  async () => {
+    console.log("Running daily habit reset");
+    await habitModel.resetDailyStatus();
+  },
+  {
+    scheduled: true,
+    timezone: "Asia/Kolkata",
+  }
+);
 
 // Listening to the server at the PORT
 app.listen(PORT, () => {
