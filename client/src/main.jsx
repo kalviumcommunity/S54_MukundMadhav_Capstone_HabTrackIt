@@ -8,7 +8,7 @@ import { AuthProvider } from "./contexts/authContext.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
+  <BrowserRouter basename="/old">
     <ChakraProvider theme={theme}>
       <AuthProvider>
         <App />

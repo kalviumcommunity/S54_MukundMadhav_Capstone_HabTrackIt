@@ -35,7 +35,7 @@ const HomePage = () => {
               </Text>
             </Heading>
             <Image
-              src="./Home Illustration.svg"
+              src="/old/Home Illustration.svg"
               h="444px"
               w="426px"
               my={4}
@@ -66,7 +66,7 @@ const HomePage = () => {
             <SignupForm />
           </Flex>
           <Image
-            src="./Home Illustration.svg"
+            src="/old/Home Illustration.svg"
             h="444px"
             w="426px"
             loading="lazy"
