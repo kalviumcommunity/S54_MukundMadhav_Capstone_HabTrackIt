@@ -174,7 +174,7 @@ const Dashboard = () => {
               <Heading size={"md"}>Your Score</Heading>
               <Flex columnGap={2}>
                 <Heading size={"md"}>{userScore}</Heading>
-                <Image src="Score Icon.svg" h={"1.6rem"} />
+                <Image src="/old/Score Icon.svg" h={"1.6rem"} />
               </Flex>
             </Flex>
             <Flex>
@@ -275,7 +275,7 @@ const Dashboard = () => {
         <Flex alignSelf={"flex-end"} justifyContent={"center"} pr={4}>
           <Tooltip label="Leaderboard" placement="bottom">
             <Link to="/leaderboard">
-              <Image src="Leaderboard Icon.svg" alt="Leaderboard" />
+              <Image src="/old/Leaderboard Icon.svg" alt="Leaderboard" />
             </Link>
           </Tooltip>
 

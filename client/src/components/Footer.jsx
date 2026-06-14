@@ -89,21 +89,21 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Image src="./LinkedIn.svg" />
+              <Image src="/old/LinkedIn.svg" />
             </a>
             <a
               href="https://www.github.com/mukundmadhav054"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Image src="./GitHub.svg" />
+              <Image src="/old/GitHub.svg" />
             </a>
             <a
               href="https://www.instagram.com/mukund__here"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Image src="./Instagram.svg" />
+              <Image src="/old/Instagram.svg" />
             </a>
           </Flex>
         </Stack>
@@ -118,7 +118,7 @@ const Footer = () => {
             align={["center", "center", "flex-start", "flex-start"]}
           >
             <Image
-              src="./HabTrackIt Logo.svg"
+              src="/old/HabTrackIt Logo.svg"
               alt="HabTrackIt Logo"
               w="170px"
               h="53px"

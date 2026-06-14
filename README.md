@@ -1,77 +1,91 @@
 # HabTrackIt
 
-**"HabTrackIt"** is a comprehensive habit tracking website designed to empower users in cultivating positive habits and breaking undesirable ones. *This user-friendly platform provides a seamless experience for tracking progress, building streaks for good habits, and overcoming challenges associated with breaking bad habits.* With **intuitive features and a visually engaging interface**, *HabTrackIt* aims to be a reliable companion on the journey towards personal development and well-being.
+**HabTrackIt** is a comprehensive habit tracking platform designed to empower users in cultivating positive habits and breaking undesirable ones. The application has been fully revamped from a legacy MERN stack app to a modern Next.js 16 application with Supabase, AI-powered coaching, and a production-ready architecture.
 
-## Table of Content :
-- [Features](#features)
+## Why the Revamp?
 
-    - [Habit Tracking](#habit-tracking)
-    - [Streak Building](#streak-building)
-    - [Bad Habit Breaker](#bad-habit-breaker)
-    - [Progress Visualization](#progress-visualization)
-    - [Reminders and Notifications](#reminders-and-Notifications)
-    - [Leaderboard](#leaderboard)
-- [Technologies Used](#technologies-used)
-- [How To Setup Locally](#how-to-setup-locally)
-    - [System Requirements](#system-requirements)
-    - [Installation Steps](#installation-steps)
-- [How to Contribute](#how-to-contribute)
-- [Contact](#contact)
-- [Links](#links)
+The original HabTrackIt was built two years ago as a capstone project using the MERN stack (MongoDB, Express, React, Node.js). While functional, the technology landscape has shifted significantly. The revamp was driven by:
 
-## Features :
-- **Habit Tracking :** Users can easily add and track their daily habits, both positive and negative, using a user-friendly interface. User can personalize each habit by setting how often he/she want to do it, and much more.
+1. **Learning Scope**: Two years of technology evolution brought new patterns — App Router, Server Components, streaming responses, and edge-ready architectures. The revamp is a hands-on exploration of where web development has moved.
 
-- **Streak Building :** HabTrackIt helps you stay on track with your positive habits by letting you create streaks for sticking to them day after day.
+2. **AI Integration**: The original app had no AI capabilities. The revamp introduces **HabAIt**, an AI habit mentor powered by Google Gemini with streaming responses, chat sessions, user personality profiling, and strict scope guardrails — demonstrating how to integrate LLMs responsibly into a product.
 
-- **Bad Habit Breaker :** Users can set goals for breaking bad habits, HabTrackIt shows progress insights, reminders to help overcome challenges of quitting habits.
+3. **Infrastructure Modernization**: Moving from a separate frontend (Vite/React) + backend (Express/MongoDB) to a single Next.js app with Supabase eliminates the need for a custom backend server. Supabase provides PostgreSQL, authentication, row-level security, and real-time capabilities out of the box.
 
-- **Progress Visualization :** HabTrackIt offers insightful visualizations of habit progress, achievements, and areas that may need improvement. This helps users stay motivated and focused on their goals.
+4. **Production Readiness**: The original app had basic auth and no security policies. The revamp adds row-level security on every table, role-based access control (user/premium/admin), admin-protected server actions, and proper environment separation.
 
-- **Reminders and Notifications :** HabTrackIt has reminders feature and sends notifications to make sure you don't forget to log your habits.
+5. **UX Quality**: The original UI was functional but basic. The revamp introduces a polished dark theme with glassmorphism, responsive design across all devices, optimistic UI patterns with server reconciliation, and streaming AI responses for a modern chat experience.
 
-- **Leaderboard :** HabTrackIt introduces a competitive edge to habit building with a leaderboard feature. Users can see how their habit streaks add up against others in the community, which adds motivation to stay on the track and be consistent.
+## Application URLs
 
-## Technologies Used :
-- **Front-end Framework :** `React.js`
-- **Back-end Frameworks :** `Node.js, Express.js`
-- **Database :** `MongoDB` and many more to add...
+| | URL |
+|---|---|
+| **New App** | [habtrackit.vercel.app](https://habtrackit.vercel.app) |
+| **Legacy App** | [habtrackit.vercel.app/old](https://habtrackit.vercel.app/old) |
 
-## How To Setup Locally ?
-- ### System Requirements : 
-    - Ensure you have Node.js and npm installed on your system.
-    - Clone the **HabTrackIt** repository to your code environment using this link. `https://github.com/kalviumcommunity/S54_MukundMadhav_Capstone_HabTrackIt.git`
-- ### Installation Steps :
-    - Navigate to the project directory using CLI.
-    - Run `npm install` to install all the required dependencies in the project directory.
-    - Run `npm run dev` to launch the local host server.
-    - Access the locally hosted HabTrackIt using your web browser on `http://localhost:5173` or whatever is your port number is.
+The new application is served at the base URL. The legacy application is accessible under the `/old` path for reference.
 
-## How to Contribute ?
-1. Set this repository up in your system.
-2. Create your own branch with the name of feature or bug fix using the command :
-`git checkout -b <feature-name>`
-3. Make your changes and ensure they adhere to our coding standards.
-4. Test your changes thoroughly to ensure they work as expected.
-5. Commit your changes with descriptive commit messages:
-`git commit -m <commit-message>`.
-6. Submit a Pull Request (PR):
-    - Go to the repository of the project.
-    - Click on "New Pull Request" button.
-    - Provide a clear title and description for your PR, explaining the changes you've made.
-    - Once reviewed, your PR will be merged into the main branch.
+## What Changed
 
-By following these steps, you can help improve HabTrackIt and contribute to making it even better for users. We appreciate your contributions!
+| Aspect | Legacy (MERN) | Revamp (Next.js) |
+|---|---|---|
+| Frontend | React (Vite) | Next.js 16 (App Router) |
+| Backend | Express.js | Server Actions + API Routes |
+| Database | MongoDB (Mongoose) | PostgreSQL (Supabase) |
+| Auth | Custom JWT | Supabase Auth (Email + Google OAuth) |
+| AI | None | Gemini API (streaming, 5-model fallback) |
+| Security | Basic | RLS + RBAC on every table |
+| Hosting | Vercel (FE) + Render (BE) | Vercel only |
+| Mobile | Basic responsive | Full responsive with touch targets |
 
-## Contact :
-**For any enquiries, feedback, or support, please reach out to me at :**
+## Legacy Application
 
-- Email : [Click Here](mailto:mukundmadhav054@gmail.com?subject=HabTrackIt)
-- Github : [Click Here](https://github.com/mukundmadhav054)
+The original application is preserved under the `/old` path and in the `client/` directory. It used:
+- **React.js** with Vite
+- **Chakra UI** for components
+- **MongoDB** with Mongoose for data
+- **Express.js** for the backend API
+- **Firebase** for push notifications
 
-We value your input and are committed to helping you on your journey towards building positive habits and breaking unwanted ones.
+## New Application
 
-## Links :
-> Here are the links of Frontend & Backend Deployment :
-> - [Frontend | HabTrackIt](https://habtrackit.vercel.app)
-> - [Backend | HabTrackIt](https://habtrackit.onrender.com)
+The revamped application lives in the `new/` directory and uses:
+- **Next.js 16** with App Router and Turbopack
+- **Supabase** for PostgreSQL, auth, and row-level security
+- **Gemini AI** for the HabAIt mentor with streaming responses
+- **Tailwind CSS v4** with custom dark theme
+- **Framer Motion** for animations
+- **Recharts** for data visualization
+
+### Key Features
+- Two-button habit tracking (Done / Skip) with debounce+batch pattern
+- Score and streak system with optimistic UI
+- HabAIt AI mentor with chat sessions and user profiling
+- Admin dashboard with user management
+- Responsive dark-theme UI
+
+### Project Structure
+```
+├── new/                  # Next.js 16 application (active)
+│   ├── src/app/          # Pages and API routes
+│   ├── src/utils/        # Utilities, Supabase, Gemini
+│   └── supabase/         # SQL migrations
+├── client/               # Legacy React app (archived)
+└── server/               # Legacy Express backend (archived)
+```
+
+## Setup
+
+See [`new/README.md`](new/README.md) for detailed setup instructions.
+
+```bash
+cd new
+npm install
+cp .env.example .env.local  # Fill in your keys
+npm run dev
+```
+
+## Contact
+
+- Email: [mukundmadhav054@gmail.com](mailto:mukundmadhav054@gmail.com?subject=HabTrackIt)
+- GitHub: [mukundmadhav054](https://github.com/mukundmadhav054)

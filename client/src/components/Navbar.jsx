@@ -62,7 +62,7 @@ const Navbar = () => {
                 <Image
                   w="170px"
                   h="53px"
-                  src="./HabTrackIt Logo.svg"
+                  src="/old/HabTrackIt Logo.svg"
                   alt="HabTrackIt Logo"
                 />
               </Link>

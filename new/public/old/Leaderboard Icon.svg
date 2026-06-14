@@ -1,0 +1,26 @@
+<svg width="82" height="82" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g filter="url(#filter0_d_4016_148)">
+<circle cx="41" cy="41" r="26" fill="url(#paint0_linear_4016_148)"/>
+</g>
+<rect x="27" y="27" width="29" height="29" fill="url(#pattern0_4016_148)"/>
+<defs>
+<filter id="filter0_d_4016_148" x="0.3" y="0.3" width="81.4" height="81.4" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset/>
+<feGaussianBlur stdDeviation="7.35"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_4016_148"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_4016_148" result="shape"/>
+</filter>
+<pattern id="pattern0_4016_148" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_4016_148" transform="scale(0.01)"/>
+</pattern>
+<linearGradient id="paint0_linear_4016_148" x1="15" y1="15" x2="67" y2="67" gradientUnits="userSpaceOnUse">
+<stop stop-color="#00FFD1"/>
+<stop offset="1" stop-color="#00D1FF"/>
+</linearGradient>
+<image id="image0_4016_148" width="100" height="100" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACJUlEQVR4nO3YMU5DQRAD0KXghjTQcf8jEGSEqH6gWTKWPbN+ZabxtxPpK2tFREQHAJ4BPK0JMMcHgJfVHWa5AXhbnWGeW+tRMNOt7Sj3T7KawbRRBg/ScxTcWc3gt8/Wb18DB3n/Y5Q+v5Rpg6yfz/qOMnGQ1qNMHaTtKJMHaTnK9EHajXLCIK1GOWWQNqOcNEiLUU4bxH6UEwexHuXUQWxHOXkQy1GmDVLo+1/iV/kDrWbA9SF/oNUMyOQPtJpBBpkN6i+oPIAZeR/yAGbkfcgDmJH3IQ9gRt6HPIAZeR/yAGbkfcgDmJH38d8A2LSakOfOIFcZxEwGMTNmkEfvbOw+yrCCY/POxu6jDCs4Nu9s7D7KsIJj887G7qNMVfCqQtTkuTPIVQYxk0HMtB1kKqj7kAcwI+9DHsCMvA95ADPyPvLae5VBzGQQMxnEzJhBHr2zsfsowwqOzTsbu48yrODYvLOx+yjDCo7NOxu7jzJVwasKUZPnziBXGcRMBjHTdpCpoO5DHsCMvA95ADPyPuQBzMj7yGvvVQYxk0HMZBAzYwZ59M7G7qMMKzg272zsPsqwgmPzzsbuowwrODbvbOw+ylQFrypETZ47g1xlEDMZxEzbQaaCug95ADPyPuQBzMj7kAcwI+9DHsCMvA95ADPyPuQBzMj7kAcwI+9DHsCMvA95ADPyPuQBzMj7kAcwI+/jPkBcZRAzGcRMBjl9kIiIWKf7AmVLUWOUSwrJAAAAAElFTkSuQmCC"/>
+</defs>
+</svg>
