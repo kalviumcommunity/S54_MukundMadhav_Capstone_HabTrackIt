@@ -28,8 +28,11 @@ export default function AdminDashboard() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [roleUpdating, setRoleUpdating] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const supabase = createClient();
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -217,23 +220,27 @@ export default function AdminDashboard() {
               <h2 className="text-lg font-bold text-white">Platform Activity (7 Days)</h2>
             </div>
             <div className="h-64 w-full">
-              <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="activityGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="name" stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#111422', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', fontSize: '11px', color: '#f8fafc' }}
-                    itemStyle={{ color: '#00f2fe' }}
-                  />
-                  <Area type="monotone" dataKey="completions" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#activityGrad)" />
-                </AreaChart>
-              </ResponsiveContainer>
+              {mounted && chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+                  <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="activityGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="name" stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#111422', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', fontSize: '11px', color: '#f8fafc' }}
+                      itemStyle={{ color: '#00f2fe' }}
+                    />
+                    <Area type="monotone" dataKey="completions" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#activityGrad)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-slate-500 text-sm">No activity data yet.</div>
+              )}
             </div>
           </div>
 
@@ -244,7 +251,7 @@ export default function AdminDashboard() {
               <h2 className="text-lg font-bold text-white">Habit Distribution</h2>
             </div>
             <div className="flex-1 flex items-center justify-center min-h-[200px]">
-              {habitPieData.some(d => d.value > 0) ? (
+              {mounted && habitPieData.some(d => d.value > 0) ? (
                 <ResponsiveContainer width="100%" height={220}>
                   <PieChart>
                     <Pie data={habitPieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={4} dataKey="value">

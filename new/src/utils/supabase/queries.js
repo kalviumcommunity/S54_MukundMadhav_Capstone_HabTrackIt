@@ -356,8 +356,6 @@ export async function getAdminUsers(supabase, options = {}) {
 }
 
 export async function getAdminUserDetail(supabase, userId) {
-  const supabaseAdmin = await _getAdminClient()
-
   // Fetch profile + habit stats
   const [profile, habits, logs] = await Promise.all([
     getProfile(supabase, userId),
@@ -403,8 +401,4 @@ export async function upsertSubscription(supabaseAdmin, userId, subData) {
   return data
 }
 
-// Internal helper (avoids circular imports)
-async function _getAdminClient() {
-  const { createAdminClient } = await import('./admin')
-  return createAdminClient()
-}
+

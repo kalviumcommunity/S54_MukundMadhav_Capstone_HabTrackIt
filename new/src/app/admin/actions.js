@@ -64,22 +64,33 @@ export async function updateUserRole(userId, newRole) {
 export async function fetchWeeklyActivity() {
   const { supabase } = await requireAdmin();
 
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - 6);
+  const startDateStr = startDate.toISOString().split('T')[0];
+
+  const { data: logs, error } = await supabase
+    .from('habit_logs')
+    .select('date')
+    .eq('status', 'completed')
+    .gte('date', startDateStr);
+
+  if (error) throw new Error(error.message);
+
+  const countsByDate = {};
+  logs?.forEach(log => {
+    countsByDate[log.date] = (countsByDate[log.date] || 0) + 1;
+  });
+
   const chartData = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const dateStr = d.toISOString().split('T')[0];
 
-    const { count } = await supabase
-      .from('habit_logs')
-      .select('id', { count: 'exact', head: true })
-      .eq('date', dateStr)
-      .eq('status', 'completed');
-
     chartData.push({
       name: d.toLocaleDateString('en-US', { weekday: 'short' }),
       date: dateStr,
-      completions: count || 0,
+      completions: countsByDate[dateStr] || 0,
     });
   }
 

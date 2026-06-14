@@ -43,27 +43,42 @@ export async function GET(request) {
   const istDate = new Date(now.getTime() + istOffset);
   const todayStr = istDate.toISOString().split('T')[0];
 
+  // Batch fetch all habits and logs for all subscribers (avoids N+1)
+  const userIds = [...new Set(subscriptions.map(s => s.user_id))];
+
+  const { data: allHabits } = await supabase
+    .from('habits')
+    .select('user_id, id, title, type')
+    .in('user_id', userIds);
+
+  const { data: allLogs } = await supabase
+    .from('habit_logs')
+    .select('user_id, habit_id, status')
+    .eq('date', todayStr)
+    .in('user_id', userIds);
+
+  const habitsByUser = {};
+  allHabits?.forEach(h => {
+    if (!habitsByUser[h.user_id]) habitsByUser[h.user_id] = [];
+    habitsByUser[h.user_id].push(h);
+  });
+
+  const logsByUser = {};
+  allLogs?.forEach(l => {
+    if (!logsByUser[l.user_id]) logsByUser[l.user_id] = [];
+    logsByUser[l.user_id].push(l);
+  });
+
   let sent = 0;
   let failed = 0;
   const invalidEndpoints = [];
 
   for (const sub of subscriptions) {
     try {
-      // Fetch user's habits to build personalized message
-      const { data: habits } = await supabase
-        .from('habits')
-        .select('id, title, type')
-        .eq('user_id', sub.user_id);
-
-      // Fetch today's logs
-      const { data: todayLogs } = await supabase
-        .from('habit_logs')
-        .select('habit_id, status')
-        .eq('user_id', sub.user_id)
-        .eq('date', todayStr);
-
-      const habitCount = habits?.length || 0;
-      const completedCount = todayLogs?.length || 0;
+      const habits = habitsByUser[sub.user_id] || [];
+      const todayLogs = logsByUser[sub.user_id] || [];
+      const habitCount = habits.length;
+      const completedCount = todayLogs.length;
       const pendingCount = habitCount - completedCount;
 
       let body;

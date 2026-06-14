@@ -117,7 +117,7 @@ export async function batchToggleHabits(dateStr, changes) {
         .select('status')
         .eq('habit_id', habitId)
         .eq('date', dateStr)
-        .single();
+        .maybeSingle();
 
       await supabase.from('habit_logs').delete().eq('habit_id', habitId).eq('date', dateStr);
 
