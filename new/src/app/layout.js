@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "HabTrackIt — Build Better Habits",
   description: "Track habits, build streaks, and get AI-powered coaching with HabAIt.",
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/favicon.svg", apple: "/icon-192.png" },
+  manifest: "/manifest.json",
   openGraph: {
     title: "HabTrackIt — Build Better Habits",
     description: "Track habits, build streaks, and get AI-powered coaching with HabAIt.",
