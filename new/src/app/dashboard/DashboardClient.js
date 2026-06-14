@@ -5,8 +5,16 @@ import { createClient } from '@/utils/supabase/client';
 import { 
   LogOut, Plus, Trash2, Check, Flame, Trophy, 
   Send, Sparkles, BarChart3, AlertTriangle, X, ShieldCheck,
-  Menu, Brain, MessageSquare
+  Menu, Brain, MessageSquare, Bell, BellOff
 } from 'lucide-react';
+import {
+  registerServiceWorker,
+  requestNotificationPermission,
+  subscribeToPush,
+  unsubscribeFromPush,
+  saveSubscription,
+  removeSubscription,
+} from '@/utils/notifications';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { addHabit, deleteHabitAction, sendMentorMessage, batchToggleHabits, fetchChatSessions, createNewChatSession, deleteChatSessionAction, fetchSessionMessages } from './actions';
@@ -34,6 +42,8 @@ export default function DashboardClient({
   const [error, setError] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(initialProfile?.notificationsEnabled || false);
+  const [notifLoading, setNotifLoading] = useState(false);
 
   // Chat session state
   const [sessions, setSessions] = useState([]);
@@ -168,6 +178,42 @@ export default function DashboardClient({
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     window.location.href = '/login';
+  };
+
+  const handleNotificationToggle = async () => {
+    if (notifLoading) return;
+    setNotifLoading(true);
+    try {
+      if (notificationsEnabled) {
+        // Disable: unsubscribe from push and notify server
+        await unsubscribeFromPush();
+        await removeSubscription();
+        setNotificationsEnabled(false);
+      } else {
+        // Enable: request permission, subscribe, save to server
+        const permission = await requestNotificationPermission();
+        if (permission !== 'granted') {
+          setError('Notification permission denied. Please enable in browser settings.');
+          return;
+        }
+        await registerServiceWorker();
+        const subscription = await subscribeToPush();
+        if (!subscription) {
+          setError('Failed to subscribe to push notifications.');
+          return;
+        }
+        const saved = await saveSubscription(subscription);
+        if (!saved) {
+          setError('Failed to save notification subscription.');
+          return;
+        }
+        setNotificationsEnabled(true);
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to update notification settings.');
+    } finally {
+      setNotifLoading(false);
+    }
   };
 
   const getTodayStatus = (habitId) => {
@@ -360,6 +406,18 @@ export default function DashboardClient({
                 <span>Admin</span>
               </a>
             )}
+            <button
+              onClick={handleNotificationToggle}
+              disabled={notifLoading}
+              title={notificationsEnabled ? 'Disable daily reminders' : 'Enable daily reminders (6 PM IST)'}
+              className={`p-2 rounded-lg transition cursor-pointer disabled:opacity-50 ${
+                notificationsEnabled
+                  ? 'text-cyan-400 hover:text-cyan-300 hover:bg-cyan-950/30'
+                  : 'text-slate-500 hover:text-slate-300 hover:bg-white/[0.03]'
+              }`}
+            >
+              {notificationsEnabled ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
+            </button>
             <span className="text-sm text-slate-400">
               <span className="hidden md:inline">Welcome back, </span>
               <span className="text-white font-semibold">{profile.username}</span>
@@ -382,6 +440,16 @@ export default function DashboardClient({
                 <ShieldCheck className="h-4 w-4" /> Admin Panel
               </a>
             )}
+            <button
+              onClick={handleNotificationToggle}
+              disabled={notifLoading}
+              className={`flex items-center gap-2 text-sm py-2 cursor-pointer disabled:opacity-50 ${
+                notificationsEnabled ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              {notificationsEnabled ? <Bell className="h-4 w-4" /> : <BellOff className="h-4 w-4" />}
+              {notificationsEnabled ? 'Reminders On' : 'Enable Reminders'}
+            </button>
             <span className="text-sm text-slate-400">
               Logged in as <span className="text-white font-semibold">{profile.username}</span>
             </span>

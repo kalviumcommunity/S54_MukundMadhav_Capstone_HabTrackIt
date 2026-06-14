@@ -67,6 +67,7 @@ export async function getDashboardData() {
       userScore: profile?.user_score || 0,
       isPremium: profile?.is_premium || false,
       role: profile?.role || 'user',
+      notificationsEnabled: profile?.notifications_enabled || false,
     },
     habits,
     logs,
