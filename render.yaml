@@ -13,7 +13,7 @@ services:
     autoDeploy: true
     envVars:
       - key: NODE_VERSION
-        value: 18.20.8
+        value: 22
       - key: MONGO_URI
         sync: false
       - key: JWT_SECRET
