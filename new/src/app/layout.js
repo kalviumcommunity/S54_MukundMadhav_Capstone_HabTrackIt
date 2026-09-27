@@ -27,7 +27,7 @@ export const metadata = {
     title: "HabTrackIt — Build Better Habits",
     description: "Track habits, build streaks, and get AI-powered coaching with HabAIt.",
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ? `https://${new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname.split('.')[0]}.vercel.app` : "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
 };
 
 export const viewport = {
