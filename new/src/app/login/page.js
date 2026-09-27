@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
-import { Mail, Lock, Eye, EyeOff, Sparkles, AlertCircle, ArrowRight, Github } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
