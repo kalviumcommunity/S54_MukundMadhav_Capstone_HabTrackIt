@@ -15,8 +15,8 @@ habitRouter.get("/habits", authenticateToken, getAllHabits);
 
 habitRouter.post("/habits", authenticateToken, habitValidator, postHabit);
 
-habitRouter.put("/habits/update/:habitId", habitValidator, updateHabit);
+habitRouter.put("/habits/update/:habitId", authenticateToken, habitValidator, updateHabit);
 
-habitRouter.delete("/habits/delete/:deleteId", deleteHabit)
+habitRouter.delete("/habits/delete/:deleteId", authenticateToken, deleteHabit)
 
 module.exports = habitRouter;

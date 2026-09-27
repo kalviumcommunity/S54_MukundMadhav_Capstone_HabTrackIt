@@ -1,4 +1,4 @@
-const { mongoose } = require("mongoose");
+const mongoose = require("mongoose");
 const habitModel = require("../models/habitModel");
 const UserModel = require("../models/userModel");
 
@@ -7,6 +7,9 @@ const getAllHabits = async (req, res) => {
     const email = req.user;
     // console.log(email)
     const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
     // console.log(user._id)
     const habits = await habitModel.find({ user: user._id });
     // console.log(habits)
