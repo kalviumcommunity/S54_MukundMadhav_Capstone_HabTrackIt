@@ -72,14 +72,14 @@ app.get("/", (req, res) => {
   });
 });
 
-// Error Handling Middleware
+// Error Handling Middleware (terminal: never call next() after responding)
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  if (res.headersSent) return next(err);
   res.status(500).send("Something went wrong!");
-  next();
 });
 
-// Health check for the hosting platform (Railway) and uptime monitors.
+// Health check for the hosting platform (Render) and uptime monitors.
 // Returns 200 when HTTP is up; reports DB/push state without failing.
 app.get("/healthz", (req, res) => {
   const dbState = mongoose.connection.readyState; // 0=off,1=on,2=connecting,3=disconnecting
@@ -94,7 +94,7 @@ app.get("/healthz", (req, res) => {
 // Keep-alive for MongoDB Atlas free/shared tiers: Atlas auto-pauses
 // clusters after prolonged inactivity, and a paused cluster makes the next
 // wake-up slow (or fail). A cheap admin ping counts as activity.
-// NOTE: the in-process cron only fires while Railway keeps this service
+// NOTE: the in-process cron only fires while Render keeps this service
 // awake. Pair it with a free external monitor (cron-job.org, UptimeRobot)
 // hitting GET /keepalive at least once a day to cover sleep periods.
 async function pingDatabase() {
