@@ -91,6 +91,42 @@ app.get("/healthz", (req, res) => {
   });
 });
 
+// Keep-alive for MongoDB Atlas free/shared tiers: Atlas auto-pauses
+// clusters after prolonged inactivity, and a paused cluster makes the next
+// wake-up slow (or fail). A cheap admin ping counts as activity.
+// NOTE: the in-process cron only fires while Railway keeps this service
+// awake. Pair it with a free external monitor (cron-job.org, UptimeRobot)
+// hitting GET /keepalive at least once a day to cover sleep periods.
+async function pingDatabase() {
+  try {
+    if (mongoose.connection.readyState !== 1 || !mongoose.connection.db) {
+      return false;
+    }
+    const t0 = Date.now();
+    await mongoose.connection.db.admin().ping();
+    console.log(`DB keep-alive ping ok (${Date.now() - t0}ms)`);
+    return true;
+  } catch (error) {
+    console.error("DB keep-alive ping failed:", error.message);
+    return false;
+  }
+}
+
+cron.schedule("0 */6 * * *", pingDatabase, {
+  scheduled: true,
+  timezone: "Asia/Kolkata",
+});
+
+// On-demand keep-alive: performs a real DB read (unlike /healthz) so
+// external monitors generate genuine cluster activity on every hit.
+app.get("/keepalive", async (req, res) => {
+  const ok = await pingDatabase();
+  res.status(ok ? 200 : 503).json({
+    status: ok ? "alive" : "degraded",
+    db: mongoose.connection.readyState === 1 ? "connected" : "degraded",
+  });
+});
+
 // Connect in the background with retry; the HTTP server stays up so the
 // platform health check passes even while Atlas is waking up.
 const startServer = async () => {
