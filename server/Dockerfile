@@ -1,5 +1,5 @@
-# Use the official Node.js image (matches engines.node 18.x in package.json)
-FROM node:18
+# Use the official Node.js image (matches engines.node 22.x in package.json)
+FROM node:22
 
 # Create and set the working directory
 WORKDIR /usr/src/app
