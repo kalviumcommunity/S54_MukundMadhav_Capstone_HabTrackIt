@@ -17,7 +17,7 @@ import {
 } from '@/utils/notifications';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { addHabit, deleteHabitAction, sendMentorMessage, batchToggleHabits, fetchChatSessions, createNewChatSession, deleteChatSessionAction, fetchSessionMessages } from './actions';
+import { addHabit, deleteHabitAction, batchToggleHabits, fetchChatSessions, createNewChatSession, deleteChatSessionAction, fetchSessionMessages } from './actions';
 
 export default function DashboardClient({
   initialProfile,

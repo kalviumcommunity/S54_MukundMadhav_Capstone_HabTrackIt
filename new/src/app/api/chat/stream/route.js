@@ -2,7 +2,6 @@ import { createClient } from '@/utils/supabase/server';
 import {
   getHabits,
   getHabitLogs,
-  getProfile,
   getChatSessions,
   getChatMessages,
   addChatMessage,
