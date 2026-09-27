@@ -2,7 +2,6 @@ import { createClient } from '@/utils/supabase/server';
 import {
   getHabits,
   getHabitLogs,
-  getProfile,
   getChatSessions,
   getChatMessages,
   addChatMessage,
@@ -20,8 +19,38 @@ const MODELS = [
   'gemma-4-26b',
 ];
 
+// In-memory per-user sliding window: 10 AI requests per minute.
+// Protects the Gemini free-tier quota from accidental/abusively rapid use.
+// (Resets on cold start — acceptable for a hobby deployment.)
+const CHAT_LIMIT = 10;
+const CHAT_WINDOW_MS = 60_000;
+const chatHits = new Map();
+
+function checkChatRateLimit(userId) {
+  const now = Date.now();
+  const hits = (chatHits.get(userId) || []).filter(t => now - t < CHAT_WINDOW_MS);
+  if (hits.length >= CHAT_LIMIT) {
+    const retryAfter = Math.ceil((hits[0] + CHAT_WINDOW_MS - now) / 1000);
+    return { allowed: false, retryAfter: Math.max(retryAfter, 1) };
+  }
+  hits.push(now);
+  chatHits.set(userId, hits);
+  if (chatHits.size > 2000) {
+    for (const [id, times] of chatHits) {
+      if (times.length === 0 || now - times[times.length - 1] >= CHAT_WINDOW_MS) {
+        chatHits.delete(id);
+      }
+      if (chatHits.size <= 1000) break;
+    }
+  }
+  return { allowed: true };
+}
+
 async function streamGeminiModel(model, apiKey, contents, systemInstruction) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}`;
+  // alt=sse returns Server-Sent Events (one complete JSON object per `data:`
+  // line), so text deltas can be forwarded to the client as they arrive
+  // instead of buffering the whole response first.
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`;
 
   const body = {
     contents,
@@ -182,6 +211,14 @@ export async function POST(request) {
       return new Response(JSON.stringify({ error: 'GEMINI_API_KEY missing' }), { status: 500 });
     }
 
+    const rate = checkChatRateLimit(user.id);
+    if (!rate.allowed) {
+      return new Response(
+        JSON.stringify({ error: `Rate limit exceeded. Try again in ${rate.retryAfter}s.` }),
+        { status: 429, headers: { 'Retry-After': String(rate.retryAfter) } }
+      );
+    }
+
     const [habits, logs, existingProfile] = await Promise.all([
       getHabits(supabase, user.id),
       getHabitLogs(supabase, user.id, { limit: 20 }),
@@ -228,56 +265,68 @@ export async function POST(request) {
       return new Response(JSON.stringify({ error: lastError?.message || 'All models unavailable' }), { status: 502 });
     }
 
-    // Buffer entire Gemini response, parse, then stream text to client
-    const reader = geminiResponse.body.getReader();
-    const decoder = new TextDecoder();
-    let rawBuffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      rawBuffer += decoder.decode(value, { stream: true });
-    }
-
-    // Parse the JSON array from Gemini
+    // True streaming: parse Gemini SSE events incrementally and forward
+    // text deltas to the client as they arrive — no buffering, no fake delay.
+    // The complete text is accumulated for the DB save before closing.
+    const encoder = new TextEncoder();
     let fullText = '';
-    try {
-      // Gemini wraps response in a JSON array: [{candidates: [...]}]
-      const arr = JSON.parse(rawBuffer);
-      const items = Array.isArray(arr) ? arr : [arr];
-      for (const item of items) {
-        const text = item?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text) fullText += text;
-      }
-    } catch (e) {
-      console.error('Failed to parse Gemini response:', e.message, rawBuffer.substring(0, 200));
-      return new Response(JSON.stringify({ error: 'Failed to parse AI response' }), { status: 500 });
-    }
 
-    if (!fullText) {
-      return new Response(JSON.stringify({ error: 'AI returned empty response' }), { status: 500 });
-    }
-
-    // Save the response to DB
-    await addChatMessage(supabase, sessionId, 'model', fullText);
-    const msgCount = await getSessionMessageCount(supabase, sessionId);
-    if (msgCount === 2) {
-      const title = userMessage.length > 50 ? userMessage.substring(0, 50) + '...' : userMessage;
-      await updateSessionTitle(supabase, sessionId, title);
-    }
-    if (msgCount > 0 && msgCount % 10 === 0) {
-      generateAndUpdateProfile(supabase, user.id, habits, logs);
-    }
-
-    // Stream text to client word by word for the typing effect
-    const words = fullText.split(/(\s+)/);
     const stream = new ReadableStream({
       async start(controller) {
-        const encoder = new TextEncoder();
-        for (const word of words) {
-          controller.enqueue(encoder.encode(word));
-          // Small delay between words for typing effect
-          await new Promise(r => setTimeout(r, 20));
+        const reader = geminiResponse.body.getReader();
+        const decoder = new TextDecoder();
+        let lineBuffer = '';
+        try {
+          for (;;) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            lineBuffer += decoder.decode(value, { stream: true });
+            const lines = lineBuffer.split('\n');
+            lineBuffer = lines.pop();
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed.startsWith('data:')) continue;
+              const payload = trimmed.slice(5).trim();
+              if (!payload || payload === '[DONE]') continue;
+              let event;
+              try {
+                event = JSON.parse(payload);
+              } catch {
+                continue; // ignore malformed fragments
+              }
+              const parts = event?.candidates?.[0]?.content?.parts;
+              for (const part of parts || []) {
+                if (part?.text) {
+                  fullText += part.text;
+                  controller.enqueue(encoder.encode(part.text));
+                }
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Gemini stream interrupted:', err.message);
+        } finally {
+          try { reader.releaseLock(); } catch {}
+        }
+
+        if (!fullText) {
+          controller.error(new Error('AI returned empty response'));
+          return;
+        }
+
+        // Persist the complete response before closing the stream
+        try {
+          await addChatMessage(supabase, sessionId, 'model', fullText);
+          const msgCount = await getSessionMessageCount(supabase, sessionId);
+          if (msgCount === 2) {
+            const title = userMessage.length > 50 ? userMessage.substring(0, 50) + '...' : userMessage;
+            await updateSessionTitle(supabase, sessionId, title);
+          }
+          if (msgCount > 0 && msgCount % 10 === 0) {
+            generateAndUpdateProfile(supabase, user.id, habits, logs);
+          }
+        } catch (err) {
+          console.error('Failed to save streamed response:', err.message);
         }
         controller.close();
       },

@@ -1,0 +1,46 @@
+# Render Blueprint — HabTrackIt legacy backend (Express + MongoDB)
+# New → Blueprint → point at this repo. Render provisions everything below;
+# you only fill in the secret env values (see server/.env.example).
+services:
+  - type: web
+    name: habtrackit-server
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install
+    startCommand: node index.js
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 18.20.8
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRATION
+        value: 7d
+      - key: DEFAULT_PASSWORD
+        sync: false
+      - key: TYPE
+        value: service_account
+      - key: PROJECT_ID
+        sync: false
+      - key: PRIVATE_KEY_ID
+        sync: false
+      - key: PRIVATE_KEY
+        sync: false
+      - key: CLIENT_EMAIL
+        sync: false
+      - key: CLIENT_ID
+        sync: false
+      - key: AUTH_URI
+        value: https://accounts.google.com/o/oauth2/auth
+      - key: TOKEN_URI
+        value: https://oauth2.googleapis.com/token
+      - key: AUTH_PROVIDER_X509_CERT_URL
+        value: https://www.googleapis.com/oauth2/v1/certs
+      - key: CLIENT_X509_CERT_URL
+        sync: false
+      - key: UNIVERSE_DOMAIN
+        value: googleapis.com

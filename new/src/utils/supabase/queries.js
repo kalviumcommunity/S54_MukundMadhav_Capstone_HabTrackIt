@@ -297,31 +297,24 @@ export async function upsertAiUserProfile(supabase, userId, summary) {
 /** ─── ADMIN ANALYTICS ─── */
 
 export async function getAdminStats(supabase) {
-  const { count: totalUsers, error: e1 } = await supabase
-    .from('profiles')
-    .select('id', { count: 'exact', head: true })
+  const todayStr = new Date().toISOString().split('T')[0];
 
-  const { count: premiumUsers, error: e2 } = await supabase
-    .from('profiles')
-    .select('id', { count: 'exact', head: true })
-    .eq('is_premium', true)
-
-  const { count: totalHabits, error: e3 } = await supabase
-    .from('habits')
-    .select('id', { count: 'exact', head: true })
-
-  const { count: totalLogs, error: e4 } = await supabase
-    .from('habit_logs')
-    .select('id', { count: 'exact', head: true })
-
-  const { count: todayLogs, error: e5 } = await supabase
-    .from('habit_logs')
-    .select('id', { count: 'exact', head: true })
-    .gte('date', new Date().toISOString().split('T')[0])
-
-  const { data: habitsByType, error: e6 } = await supabase
-    .from('habits')
-    .select('type')
+  // All six queries are independent — run them concurrently.
+  const [
+    { count: totalUsers, error: e1 },
+    { count: premiumUsers, error: e2 },
+    { count: totalHabits, error: e3 },
+    { count: totalLogs, error: e4 },
+    { count: todayLogs, error: e5 },
+    { data: habitsByType, error: e6 },
+  ] = await Promise.all([
+    supabase.from('profiles').select('id', { count: 'exact', head: true }),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('is_premium', true),
+    supabase.from('habits').select('id', { count: 'exact', head: true }),
+    supabase.from('habit_logs').select('id', { count: 'exact', head: true }),
+    supabase.from('habit_logs').select('id', { count: 'exact', head: true }).gte('date', todayStr),
+    supabase.from('habits').select('type'),
+  ]);
 
   if (e1 || e2 || e3 || e4 || e5 || e6) {
     throw new Error('Failed to fetch admin stats')
